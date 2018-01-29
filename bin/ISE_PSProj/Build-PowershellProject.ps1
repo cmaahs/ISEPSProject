@@ -248,6 +248,7 @@ Function Build-PowershellProject
                     if ( ( ( Test-Path $moduleFile ) -and ( $Force -eq $true ) ) -or ( -Not ( Test-Path $moduleFile ) ) )
                     {
                         $psmContent = New-IncludeBasedModuleFile -ProjectFile $ProjectFile
+
                         $initFile = (Get-PowershellProjectDefaultModuleInitFile)
                         if ( Test-Path $initFile )
                         {
