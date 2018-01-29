@@ -223,6 +223,11 @@ Function Build-PowershellProject
 
                     if ( ( ( Test-Path $moduleFile ) -and ( $Force -eq $true ) ) -or ( -Not ( Test-Path $moduleFile ) ) )
                     {
+                        $initFile = (Get-PowershellProjectDefaultModuleInitFile)
+                        if ( Test-Path $initFile )
+                        {
+                            $newModule += (Get-Content -Path $initFile)
+                        }
                         $newModule | Out-File -FilePath $moduleFile -Force -Encoding ascii
                         if ( ( $PerformBackup -eq $true ) -and ( $backupModule.Length -gt 0 ) )
                         {
@@ -248,7 +253,6 @@ Function Build-PowershellProject
                     if ( ( ( Test-Path $moduleFile ) -and ( $Force -eq $true ) ) -or ( -Not ( Test-Path $moduleFile ) ) )
                     {
                         $psmContent = New-IncludeBasedModuleFile -ProjectFile $ProjectFile
-
                         $initFile = (Get-PowershellProjectDefaultModuleInitFile)
                         if ( Test-Path $initFile )
                         {
