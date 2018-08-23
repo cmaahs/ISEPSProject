@@ -12,7 +12,7 @@
 RootModule = '.\ISEPSProject.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.3.13'
+ModuleVersion = '1.3.15'
 
 # ID used to uniquely identify this module
 GUID = 'f041d119-4241-4d6b-bdf4-ab1e308542e2'
@@ -105,6 +105,8 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = @'
+1.3.15 - Scoping problem fixed.
+1.3.14 - Adding pre-build command support.
 1.3.13 - Adding verbose to help build.
 1.3.12 - Fixing some errors in build.
 1.3.11 - Attempting to fix the removal of the ./bin/ directory during build.
