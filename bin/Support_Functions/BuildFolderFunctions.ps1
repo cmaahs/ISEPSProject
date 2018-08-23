@@ -1,3 +1,5 @@
+function New-PspIncludeBasedModuleFile
+{
 <#
 .Synopsis
    Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
@@ -5,7 +7,7 @@
    This is used to auto-determine the TAB name that the files will be placed upon.
 
 .EXAMPLE
-PS>Get-ISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
+PS>Get-PspISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PspPowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
 ISE_Project_Backup
 
 
@@ -29,18 +31,16 @@ ISE_Project_Backup
     }
 
 #>
-function New-IncludeBasedModuleFile
-{
     [CmdletBinding()]
     Param
     (        
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin
@@ -97,20 +97,16 @@ function New-IncludeBasedModuleFile
     }
 }
 
-
+function Save-PspSourceToBuildFolder
+{
 <#
 .Synopsis
-   Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
+   
 .DESCRIPTION
-   This is used to auto-determine the TAB name that the files will be placed upon.
-
+   
 .EXAMPLE
-PS>Get-ISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
-ISE_Project_Backup
 
 #>
-function Save-SourceToBuildFolder
-{
     [CmdletBinding()]
     Param
     (        
@@ -128,14 +124,16 @@ function Save-SourceToBuildFolder
     )
 
     Begin
-    {    
+    {  
+        $resultItem = "" | Select-Object BuildPath,WrittenOK  
         if ( -not ( Test-Path "bin" ) )
         {
             New-Item -Path "./" -Name "bin" -ItemType Directory
         }    
-        $writtenOK = $false
+        $resultItem.writtenOK = $false
         $fileTargetDir = $ProjectFileItem.Split("\")[0]
         $fileTarget = "bin\$($ProjectFileItem)"
+        $resultItem.BuildPath = $fileTargetDir
         if ( -not ( Test-Path "bin\$($fileTargetDir)" ) )
         {
             New-Item -Path "bin" -Name $fileTargetDir -ItemType Directory
@@ -145,7 +143,7 @@ function Save-SourceToBuildFolder
 
         if ( Test-Path $fileTarget )
         {
-            $writtenOK = $true
+            $resultItem.writtenOK = $true
         }
     }
     Process
@@ -153,32 +151,77 @@ function Save-SourceToBuildFolder
     }
     End
     {
-        Write-Output $writtenOK
+        Write-Output $resultItem
     }
 }
+
+function Get-PspBuildFolderPathForSource
+{
 <#
 .Synopsis
-   Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
+   Returns the path to the Build folder location for a source item.
 .DESCRIPTION
-   This is used to auto-determine the TAB name that the files will be placed upon.
 
 .EXAMPLE
-PS>Get-ISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
-ISE_Project_Backup
 
 #>
-function Reset-BuildFolder
-{
     [CmdletBinding()]
     Param
     (        
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # File Item from .psproj file.
+        [Parameter(Mandatory=$true,
+                   Position=0)]
+        [string]
+        $ProjectFileItem        
+    )
+
+    Begin
+    {  
+        $itemPath = ""       
+        if ( Test-Path "bin" )
+        {
+            $fileTargetDir = $ProjectFileItem.Split("\")[0]
+            $fileTarget = "bin\$($ProjectFileItem)"
+            if ( Test-Path "bin\$($fileTargetDir)" ) 
+            {
+                if ( Test-Path $fileTarget )
+                {
+                    $itemPath = $fileTarget
+                }
+            }
+
+        }    
+
+    }
+    Process
+    {
+    }
+    End
+    {
+        Write-Output $itemPath
+    }
+}
+
+function Reset-PspBuildFolder
+{
+<#
+.Synopsis
+   
+.DESCRIPTION
+   
+.EXAMPLE
+
+#>
+    [CmdletBinding()]
+    Param
+    (        
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
-                   Position=3)]
+                   Position=4)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin
@@ -190,27 +233,7 @@ function Reset-BuildFolder
             Write-Verbose "Build Path: $($buildPath)"
             if ( Test-Path $buildPath )
             {
-                $fileList = Get-ChildItem -Path $buildPath -Recurse -File
-                $dirList = Get-ChildItem -Path $buildPath -Recurse -Directory
-
-                Write-Verbose "File Count: $($fileList.Count)"
-                Write-Verbose "Dir Count: $($dirList.Count)"
-                foreach ( $f in $fileList )
-                {
-                    if ( $f.FullName.ToString().Contains("\bin\") )
-                    {
-                        Write-Verbose "Removing $($f.FullName)"
-                        $f.Delete()
-                    }
-                }
-                foreach ( $d in $dirList )
-                {
-                    if ( $d.FullName.ToString().Contains("\bin\") ) 
-                    {
-                        Write-Verbose "Removing $($d.FullName)"
-                        $d.Delete()
-                    }
-                }
+                Remove-Item -Path $buildPath -Recurse -Force
             }
             $buildPath = ""
         } else {
@@ -226,29 +249,26 @@ function Reset-BuildFolder
     }
 }
 
+function Get-PspBuildFolder
+{
 <#
 .Synopsis
-   Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
-.DESCRIPTION
-   This is used to auto-determine the TAB name that the files will be placed upon.
+   
+.DESCRIPTION   
 
 .EXAMPLE
-PS>Get-ISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
-ISE_Project_Backup
 
 #>
-function Get-BuildFolder
-{
     [CmdletBinding()]
     Param
     (        
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
-                   Position=4)]
+                   Position=5)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin

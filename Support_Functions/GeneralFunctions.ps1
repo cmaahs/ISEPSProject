@@ -1,16 +1,68 @@
-﻿<#
+﻿Function Get-PspRelativePathFromProjectRoot
+{
+<#
+.Synopsis
+   Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
+.DESCRIPTION
+   Used to feed other Powershell Project commands.
+
+.EXAMPLE
+
+#>
+    [CmdletBinding()]
+    Param
+    (
+        # File Item from .psproj file.
+        [Parameter(Mandatory=$false,
+                   Position=0)]        
+        $FullName
+        <#PINC:PARAMCOMMA#>
+        <#PINC:ProjectFile#>
+    )
+
+    Begin
+    {        
+    }
+    Process
+    {
+        if ( Test-Path $ProjectFile )
+        {
+            if ( Test-Path $FullName )
+            {
+                $rootPath = (Get-ChildItem ($ProjectFile)).Directory.FullName
+                if ( $FullName.StartsWith($rootPath) )
+                {
+                    $fileFullPath = (Get-ChildItem "$($FullName)").FullName
+                } else {        
+                    $fileFullPath = (Get-ChildItem "$($rootPath)$($FullName)").FullName
+                }
+                $relativeName = $fileFullPath.Substring($rootPath.Length+1)       
+                Write-Output ".\$($relativeName)"
+            } else {
+                Write-Output ""
+            }
+        } else {
+            Write-Output ""
+        }
+    }
+    End
+    {
+    }
+}
+
+function Get-PspISETabNameFromPath
+{
+<#
 .Synopsis
    Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
 .DESCRIPTION
    This is used to auto-determine the TAB name that the files will be placed upon.
 
 .EXAMPLE
-PS>Get-ISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
+PS>Get-PspISETabNameFromPath -ProjectFileItem ".\ISE_Project_Backup\Compare-PspPowershellProjectBackup.ps1 -ProjectFile ".\ISEPSProject.psproj"
 ISE_Project_Backup
 
 #>
-function Get-ISETabNameFromPath
-{
     [CmdletBinding()]
     Param
     (
@@ -19,7 +71,7 @@ function Get-ISETabNameFromPath
                    Position=0)]
         [string]
         $ProjectFileItem
-        ,
+        <#PINC:PARAMCOMMA#>
         <#PINC:ProjectFile#>
     )
 
@@ -53,22 +105,22 @@ function Get-ISETabNameFromPath
     }
 }
 
+function Get-PspCSVFromStringArray
+{
 <#
 .Synopsis
    Given a [string[]] array, convert it to a CSV formatted string.
 .DESCRIPTION
-   Used by the Build-PowershellProject command to output the FunctionsToExport = line for inclusion in the psd1 file.
+   Used by the Start-PspBuildPowershellProject command to output the FunctionsToExport = line for inclusion in the psd1 file.
 
 .EXAMPLE
-PS> $functionInfo = (Get-PowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName).FunctionName
-PS> Get-CSVFromStringArray -StringArray $functionInfo -SingleQuotes
-'Add-SourceToPowershellProject','Build-PowershellProject','Clean-PowershellProject','Close-PowershellProject','Create-PowershellProject','Get-PowershellProject','Open-PowershellP
-roject','Remove-SourceFromPowershellProject','Set-IncludeInBuildFlagForSource','Set-PowershellProjectDefaults','Get-CSVFromStringArray','Get-PowershellProjectBackupData','Get-Pow
-ershellProjectCurrentVersion','Get-PowershellProjectDefaultIncludeInBuild','Get-PowershellProjectDefaultProjectFile','Get-PowershellProjectFunctions','Get-PowershellProjectVersio
-n','Save-PowershellProject','Save-PowershellProjectDefaults','Update-PowershellProjectVersion'
+PS> $functionInfo = (Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName).FunctionName
+PS> Get-PspCSVFromStringArray -StringArray $functionInfo -SingleQuotes
+'Add-PspSourceToPowershellProject','Start-PspBuildPowershellProject','Repair-PspPowershellProject','Close-PspPowershellProject','New-PspPowershellProject','Get-PspPowershellProject','Open-PowershellP
+roject','Remove-PspSourceFromPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Get-PspCSVFromStringArray','Get-PspPowershellProjectBackupData','Get-Pow
+ershellProjectCurrentVersion','Get-PspPowershellProjectDefaultIncludeInBuild','Get-PspPowershellProjectDefaultProjectFile','Get-PspPowershellProjectFunctions','Get-PspPowershellProjectVersio
+n','Save-PspPowershellProject','Save-PspPowershellProjectDefaults','Update-PspPowershellProjectVersion'
 #>
-function Get-CSVFromStringArray
-{
     [CmdletBinding()]
     Param
     (
@@ -107,8 +159,9 @@ function Get-CSVFromStringArray
         Write-Output $csvLine
     }
 }
+
 #this doesn't work.
-function ConvertFrom-CliXml {
+function ConvertFrom-PspCliXml {
     param(
         [parameter(position=0,mandatory=$true,valuefrompipeline=$true)]
         [validatenotnull()]
@@ -140,4 +193,22 @@ function ConvertFrom-CliXml {
             }
         }
     }
+}
+
+Function Start-IsePsPublishToEvcNuGet
+{
+    cd C:\users\Christopher.Maahs\Documents\Projects\ISEPSProject
+    Start-PspBuildPowershellProject -Verbose -Force 
+    cd ..\.. 
+    Uninstall-Module -Name ISEPSProject 
+    cd .\Projects\ISEPSProject
+    New-Item -ItemType Directory -Path 'C:\Program Files\WindowsPowerShell\Modules\' -Name ISEPSProject
+    Start-PspDeployPowershellProject -Verbose -Force 
+    cd ..\..
+    Publish-Module -Name ISEPSProject -NuGetApiKey (Get-VaultNuGetKey) -Repository EvcNuGet 
+    Remove-Item -Path 'C:\Program Files\WindowsPowerShell\Modules\ISEPSProject' -Recurse -Force  
+    Write-Verbose "Sleeping for 3 minutes for replication to happen..." -Verbose
+    Start-Sleep -Seconds 180
+    Install-Module -Name ISEPSProject -Repository EvcNuGet
+    cd .\Projects\ISEPSProject
 }

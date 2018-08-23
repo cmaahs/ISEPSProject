@@ -12,7 +12,7 @@
 RootModule = '.\ISEPSProject.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2'
+ModuleVersion = '1.3.13'
 
 # ID used to uniquely identify this module
 GUID = 'f041d119-4241-4d6b-bdf4-ab1e308542e2'
@@ -66,7 +66,7 @@ PowerShellVersion = '3.0'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Add-SourceToPowershellProject','Build-PowershellProject','Build-SourceFileFromPowershellProject','Clean-PowershellProject','Close-PowershellProject','=','Create-PowershellProject','Deploy-PowershellProject','Get-PowershellProject','Open-PowershellProject','Remove-SourceFromPowershellProject','Set-IncludeInBuildFlagForSource','Set-PowershellProjectDefaults','Compare-PowershellProjectBackup','Get-PowershellProjectBackup','Restore-PowershellProjectBackup','Get-PowershellProjectDefaults','Get-PowershellProjectFunctions')
+FunctionsToExport = @('Add-PspSourceToPowershellProject','Close-PspPowershellProject','Get-PspPowershellProject','=','New-PspPowershellProject','Open-PspPowershellProject','Remove-PspSourceFromPowershellProject','Repair-PspPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Set-PspReadMeOrderForSource','Start-PspBuildPowershellProject','Start-PspBuildSourceFileFromPowershellProject','Start-PspDeployPowershellProject','Compare-PspPowershellProjectBackup','Get-PspPowershellProjectBackup','Restore-PspPowershellProjectBackup','Get-PspRelativePathFromProjectRoot','Start-IsePsPublishToEvcNuGet','Get-PspPowershellProjectDefaults','New-PspIsePsZipInstallDetails','Get-PspPowershellProjectFilesNotIncludedInProject','Get-PspPowershellProjectFunctions','Set-Psp','Start-Psp')
 
 # Cmdlets to export from this module
 CmdletsToExport = '*'
@@ -104,7 +104,24 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Added sub-directory support.  TAB names will be based off of sub-directory names from the project root directory.'
+        ReleaseNotes = @'
+1.3.13 - Adding verbose to help build.
+1.3.12 - Fixing some errors in build.
+1.3.11 - Attempting to fix the removal of the ./bin/ directory during build.
+1.3.9  - Fixing Module Init all being on ONE line at the end of the IncludeStyle psm1 file.        
+1.3.8  - Adding a function to automate the build and install specifically for Veritas networks.
+1.3.7  - Add Missing Files from Product functionality.
+1.3.6  - SingleFile type was only including a single file in the README.md file.
+1.3.5  - add Out-String to Get-Help for building README.md file.
+1.3.4  - fix a singlefile format build error.
+1.3.3  - Final fix on Pipeline, and deploy of about*.txt files for Languages.
+1.3.2  - fixing some Pipeline stuff and naming convention.
+1.3.1  - Cleanup of PINC and Documentation
+1.2.9  - Change the way we pull documentation for the README.md file.
+1.2.8  - Add support to pull interior function documentation for README.md file.
+1.2.7  - Adding support to extract ZIP files during the build/deploy process.
+Added sub-directory support.  TAB names will be based off of sub-directory names from the project root directory.
+'@
 
     } # End of PSData hashtable
 

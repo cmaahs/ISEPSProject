@@ -11,4 +11,7 @@ $Support_Functions = @(Get-ChildItem -Path $PSScriptRoot\bin\Support_Functions\*
         {
             Write-Error -Message "Failed to import function $($import.fullname): $_"
         }
-    }Write-Verbose "Thank you for using ISEPSProject" -Verbose
+    }
+
+Update-FormatData -AppendPath $PSScriptRoot\bin\Support_Functions\PowershellProject.Format.ps1xml
+
