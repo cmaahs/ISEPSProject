@@ -1,3 +1,5 @@
+Function Get-PspPowershellProjectDefaults
+{
 <#
 .Synopsis
    Save a .psproj\defaults.clixml file.  This will allow you to skip the -ProjectFile parameter and sets the default IncludeInBuild option for adding items to the project.
@@ -5,14 +7,12 @@
    This is simply a file that will be read by each of the commands in order to pre-populate the -ProjectFile and -IncludeInBuild parameters.
 
 .EXAMPLE
-PS> $default = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle
-PS> $defualt.ProjectFile = ".\ISEPSProject.psproj"
-PS> $default.IncludeInBuild = $true
-PS> $default.BuildStyle = "IncludeStyle"
-PS> Save-PowershellProjectDefaults -DefaultData $default
+    $default = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle
+    $defualt.ProjectFile = ".\ISEPSProject.psproj"
+    $default.IncludeInBuild = $true
+    $default.BuildStyle = "IncludeStyle"
+    Save-PspPowershellProjectDefaults -DefaultData $default
 #>
-Function Get-PowershellProjectDefaults
-{
     [CmdletBinding()]
     Param
     (       
@@ -35,6 +35,9 @@ Function Get-PowershellProjectDefaults
         Write-Output $DefaultData | Format-List
     }
 }
+
+function Save-PspPowershellProjectDefaults
+{
 <#
 .Synopsis
    Save a .psproj\defaults.clixml file.  This will allow you to skip the -ProjectFile parameter and sets the default IncludeInBuild option for adding items to the project.
@@ -42,14 +45,12 @@ Function Get-PowershellProjectDefaults
    This is simply a file that will be read by each of the commands in order to pre-populate the -ProjectFile and -IncludeInBuild parameters.
 
 .EXAMPLE
-PS> $default = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle
-PS> $defualt.ProjectFile = ".\ISEPSProject.psproj"
-PS> $default.IncludeInBuild = $true
-PS> $default.BuildStyle = "IncludeStyle"
-PS> Save-PowershellProjectDefaults -DefaultData $default
+    $default = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle
+    $defualt.ProjectFile = ".\ISEPSProject.psproj"
+    $default.IncludeInBuild = $true
+    $default.BuildStyle = "IncludeStyle"
+    Save-PspPowershellProjectDefaults -DefaultData $default
 #>
-function Save-PowershellProjectDefaults
-{
     [CmdletBinding()]
     Param
     (
@@ -71,6 +72,9 @@ function Save-PowershellProjectDefaults
     {
     }
 }
+
+function Get-PspPowershellProjectDefaultProjectFile
+{
 <#
 .Synopsis
    Extract the ProjectFile default from .psproj\defaults.clixml file.
@@ -79,10 +83,8 @@ function Save-PowershellProjectDefaults
 
 .EXAMPLE
 For Use in [Parameters]
-   $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+   $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
 #>
-function Get-PowershellProjectDefaultProjectFile
-{
     [CmdletBinding()]
     Param
     (       
@@ -110,6 +112,9 @@ function Get-PowershellProjectDefaultProjectFile
     {
     }
 }
+
+function Get-PspPowershellProjectDefaultIncludeInBuild
+{
 <#
 .Synopsis
    Extract the IncludeInBuild default from .psproj\defaults.clixml file.
@@ -118,10 +123,8 @@ function Get-PowershellProjectDefaultProjectFile
 
 .EXAMPLE
 For Use in [Parameters]
-   $IncludeInBuild = (Get-PowershellProjectDefaultIncludeInBuild)
+   $IncludeInBuild = (Get-PspPowershellProjectDefaultIncludeInBuild)
 #>
-function Get-PowershellProjectDefaultIncludeInBuild
-{
     [CmdletBinding()]
     Param
     (    
@@ -144,6 +147,9 @@ function Get-PowershellProjectDefaultIncludeInBuild
     {
     }
 }
+
+function Get-PspCommonParameters
+{
 <#
 .Synopsis
    Get the Common Parameters
@@ -151,10 +157,8 @@ function Get-PowershellProjectDefaultIncludeInBuild
    Read the Common Parameters from the .psproj directory, commonParameters.clixml file.
 
 .EXAMPLE
-   $commonParameters = Get-CommonParameters
+   $commonParameters = Get-PspCommonParameters
 #>
-function Get-CommonParameters
-{
     [CmdletBinding()]
     Param
     (    
@@ -177,6 +181,9 @@ function Get-CommonParameters
     {
     }
 }
+
+function Get-PspPowershellProjectDefaultBuildStyle
+{
 <#
 .Synopsis
    Extract the BuildStyle default from .psproj\defaults.clixml file.
@@ -185,10 +192,8 @@ function Get-CommonParameters
 
 .EXAMPLE
 For Use in [Parameters]
-   $BuildStyle = (Get-PowershellProjectDefaultBuildStyle)
+   $BuildStyle = (Get-PspPowershellProjectDefaultBuildStyle)
 #>
-function Get-PowershellProjectDefaultBuildStyle
-{
     [CmdletBinding()]
     Param
     (    
@@ -217,6 +222,8 @@ function Get-PowershellProjectDefaultBuildStyle
     }
 }
 
+function Get-PspPowershellProjectDefaultLocalDeployDirectory
+{
 <#
 .Synopsis
    Extract the BuildStyle default from .psproj\defaults.clixml file.
@@ -225,10 +232,8 @@ function Get-PowershellProjectDefaultBuildStyle
 
 .EXAMPLE
 For Use in [Parameters]
-   $BuildStyle = (Get-PowershellProjectDefaultBuildStyle)
+   $BuildStyle = (Get-PspPowershellProjectDefaultBuildStyle)
 #>
-function Get-PowershellProjectDefaultLocalDeployDirectory
-{
     [CmdletBinding()]
     Param
     (    
@@ -250,6 +255,8 @@ function Get-PowershellProjectDefaultLocalDeployDirectory
     }
 }
 
+function Get-PspPowershellProjectDefaultModuleInitFile
+{
 <#
 .Synopsis
    Extract the BuildStyle default from .psproj\defaults.clixml file.
@@ -258,10 +265,8 @@ function Get-PowershellProjectDefaultLocalDeployDirectory
 
 .EXAMPLE
 For Use in [Parameters]
-   $BuildStyle = (Get-PowershellProjectDefaultBuildStyle)
+   $BuildStyle = (Get-PspPowershellProjectDefaultBuildStyle)
 #>
-function Get-PowershellProjectDefaultModuleInitFile
-{
     [CmdletBinding()]
     Param
     (    
@@ -283,18 +288,18 @@ function Get-PowershellProjectDefaultModuleInitFile
     }
 }
 
+function Get-PspPowershellProjectDefaultModulePSDFile
+{
 <#
 .Synopsis
-   Extract the BuildStyle default from .psproj\defaults.clixml file.
+   Extract the ModulePSDFile default from .psproj\defaults.clixml file.
 .DESCRIPTION
-   Called by the commands to fetch the default value for BuildStyle.
+   Called by the commands to fetch the default value for ModulePSDFile.
 
 .EXAMPLE
 For Use in [Parameters]
-   $BuildStyle = (Get-PowershellProjectDefaultBuildStyle)
+   $modulePSDFile = (Get-PspPowershellProjectDefaultModulePSDFile)
 #>
-function Get-PowershellProjectDefaultModulePSDFile
-{
     [CmdletBinding()]
     Param
     (    
@@ -315,4 +320,117 @@ function Get-PowershellProjectDefaultModulePSDFile
         Write-Output $defaults.ModulePSDFile
     }
 }
+
+function Get-PspPowershellProjectDefaultModuleREADMEFile
+{
+<#
+.Synopsis
+   Extract the README.md default from .psproj\defaults.clixml file.
+.DESCRIPTION
+   Called by the commands to fetch the default value for README.
+
+.EXAMPLE
+For Use in [Parameters]
+   $readmeFile = (Get-PspPowershellProjectDefaultREADMEFile)
+#>
+    [CmdletBinding()]
+    Param
+    (    
+    )
+
+    Begin
+    {        
+    }
+    Process
+    {
+        if ( Test-Path ".\.psproj\defaults.clixml" ) 
+        {
+            $defaults = Import-Clixml -Path ".\.psproj\defaults.clixml"
+        }
+    }
+    End
+    {
+        Write-Output $defaults.ModuleREADMEFile
+    }
+}
+
+Function New-PspIsePsZipInstallDetails 
+{
+<#
+.Synopsis
+    Extract Zip File information.
+.DESCRIPTION
+   
+.EXAMPLE    
+#>
+    [CmdletBinding()]
+    Param
+    (  
+        # Zip File to expand during deploy
+        [Parameter(Mandatory=$true,
+                   Position=0)]
+        [string]
+        $ZipFile
+        ,
+        # Relative Path to Extract ZIP to
+        [Parameter(Mandatory=$true,
+                   Position=1)]
+        [string]
+        $RelativeInstallPath              
+    )
+
+    Begin
+    {  
+        $item = "" | Select-Object ZipFile,RelativeInstallPath
+        $item.ZipFile = $ZipFile
+        $item.RelativeInstallPath = $RelativeInstallPath              
+    }
+    Process
+    {
+        
+    }
+    End
+    {
+        Write-Output $item
+    }
+}
+
+function Get-PspPowershellProjectDefaultModuleAdditionalZipFile
+{
+<#
+.Synopsis
+    Get the associated ZIP file from the Defaults.
+.DESCRIPTION
+    Used to UNZIP the installation ZIP file during the Build process.
+.EXAMPLE
+    $zf = Get-PspPowershellProjectDefaultModuleAdditionalZipFile
+#>
+    [CmdletBinding()]
+    Param
+    (    
+    )
+
+    Begin
+    {        
+    }
+    Process
+    {
+        if ( Test-Path ".\.psproj\defaults.clixml" ) 
+        {
+            $defaults = Import-Clixml -Path ".\.psproj\defaults.clixml"
+        }
+    }
+    End
+    {
+        if ( $defaults.ModuleAdditionalZipFile.Length -gt 0 )
+        {
+            $splitData = $defaults.ModuleAdditionalZipFile.Split("|")
+            $item = "" | Select-Object ZipFile,RelativeInstallPath
+            $item.ZipFile = $splitData[0]
+            $item.RelativeInstallPath = $splitData[1]      
+            Write-Output $item
+        }
+    }
+}
+
 

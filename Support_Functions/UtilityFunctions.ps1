@@ -1,14 +1,14 @@
-﻿<#
+﻿function Get-PspPowershellProjectCurrentVersion
+{
+<#
 .Synopsis
    Returns the most current version of .psproj files.
 .DESCRIPTION
    Returns the lastest version of the .psproj files supported by the code.
 
 .EXAMPLE
-   Get-PowershellProjectCurrentVersion
+   Get-PspPowershellProjectCurrentVersion
 #>
-function Get-PowershellProjectCurrentVersion
-{
     [CmdletBinding()]
     Param
     (        
@@ -28,6 +28,8 @@ function Get-PowershellProjectCurrentVersion
     }
 }
 
+function Get-PspPowershellProjectVersion
+{
 <#
 .Synopsis
    Get the .psproj data version
@@ -35,25 +37,23 @@ function Get-PowershellProjectCurrentVersion
    Returns the version of the .psproj data
 
 .EXAMPLE
-PS> Get-PowershellProjectVersion -ProjectFile ISEPSProject.psproj
+PS> Get-PspPowershellProjectVersion -ProjectFile ISEPSProject.psproj
 
 Version CurrentVersion IsLatest
 ------- -------------- --------
 1.1     1.1                True
 
 #>
-function Get-PowershellProjectVersion
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin
@@ -67,7 +67,7 @@ function Get-PowershellProjectVersion
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -77,7 +77,7 @@ function Get-PowershellProjectVersion
         {
             $projectData = Import-Clixml -Path $ProjectFile
             $item = "" | Select-Object Version,CurrentVersion,IsLatest
-            $item.CurrentVersion = (Get-PowershellProjectCurrentVersion).CurrentVersion
+            $item.CurrentVersion = (Get-PspPowershellProjectCurrentVersion).CurrentVersion
             $item.IsLatest = $false
         
             if ( $projectData.ContainsKey("ISEPSProjectDataVersion") )
@@ -100,6 +100,9 @@ function Get-PowershellProjectVersion
         }
     }
 }
+
+function Update-PspPowershellProjectVersion_Old
+{
 <#
 .Synopsis
    Process to upgrade from a previous version to current.
@@ -107,15 +110,13 @@ function Get-PowershellProjectVersion
    When the existing .psproj file is not at the current version, calling this command will upgrade all previous version to the current version.
 
 .EXAMPLE
-PS> Update-PowershellProjectVersion -ProjectFile ISEPSProject.psproj
+PS> Update-PspPowershellProjectVersion -ProjectFile ISEPSProject.psproj
 
 UpgradeNeeded UpgradeStatus    
 ------------- -------------    
          True Updated to latest
 
 #>
-function Update-PowershellProjectVersion
-{
     [CmdletBinding()]
     Param
     (
@@ -125,7 +126,7 @@ function Update-PowershellProjectVersion
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin
@@ -139,7 +140,7 @@ function Update-PowershellProjectVersion
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -149,7 +150,7 @@ function Update-PowershellProjectVersion
         {
             $projectData = Import-Clixml -Path $ProjectFile
 
-            $dataVersion = Get-PowershellProjectVersion -ProjectFile $ProjectFile
+            $dataVersion = Get-PspPowershellProjectVersion -ProjectFile $ProjectFile
             $item = "" | Select-Object UpgradeNeeded,UpgradeStatus
 
             if ( $dataVersion.Version -ne $dataVersion.CurrentVersion ) 
@@ -232,6 +233,9 @@ function Update-PowershellProjectVersion
         }
     }
 }
+
+function Get-PspPowershellProjectBackupData
+{
 <#
 .Synopsis
    Gets the BACKUP Data from a .psproj file.
@@ -239,7 +243,7 @@ function Update-PowershellProjectVersion
    Returns a hash table of backup data.
 
 .EXAMPLE
-PS> $backupData = Get-PowershellProjectBackupData -ProjectFile ISEPSProject.psproj
+PS> $backupData = Get-PspPowershellProjectBackupData -ProjectFile ISEPSProject.psproj
 PS> $backupData
 Name                           Value                                                                                                                                             
 ----                           -----                                                                                                                                             
@@ -254,18 +258,16 @@ Name                           Value
 2017-08-28_144227              {<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">,   <Obj ...
 
 #>
-function Get-PowershellProjectBackupData
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
         ,
         # Switch to return ALL backups, instead of the previous 9.
         [Parameter(Mandatory=$false,
@@ -285,7 +287,7 @@ function Get-PowershellProjectBackupData
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -326,6 +328,9 @@ function Get-PowershellProjectBackupData
         }
     }
 }
+
+function Save-PspPowershellProject
+{
 <#
 .Synopsis
    Save a .psproj file.
@@ -333,24 +338,22 @@ function Get-PowershellProjectBackupData
    This process saves, and optionally stores backups within the NTFS streams of the file.
 
 .EXAMPLE
-PS> $projectData = Get-PowershellProject -ProjectFile ISEPSProject.psproj 
-PS> Save-PowershellProject -ProjectFile ISEPSProject.psproj -ProjectData $projectData
+PS> $projectData = Get-PspPowershellProject -ProjectFile ISEPSProject.psproj 
+PS> Save-PspPowershellProject -ProjectFile ISEPSProject.psproj -ProjectData $projectData
 
 #>
-function Save-PowershellProject
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
         ,
-        #backup data gathered from the Get-PowershellProjectBackupData command.
+        #backup data gathered from the Get-PspPowershellProjectBackupData command.
         [Parameter(Mandatory=$false,
                    Position=1)]
         [Hashtable]
@@ -374,7 +377,7 @@ function Save-PowershellProject
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -385,9 +388,9 @@ function Save-PowershellProject
             if ( $SkipBackup -eq $false )
             {
                 $bakProjectData = Get-Content -Path $ProjectFile
-                $backupData = Get-PowershellProjectBackupData $ProjectFile
+                $backupData = Get-PspPowershellProjectBackupData $ProjectFile
             } else {
-                $backupData = Get-PowershellProjectBackupData $ProjectFile -AllBackups
+                $backupData = Get-PspPowershellProjectBackupData $ProjectFile -AllBackups
             }
 
             $projectData | Export-Clixml -Path $ProjectFile -Force
@@ -416,6 +419,9 @@ function Save-PowershellProject
         }
     }
 }
+
+function Save-PspPowershellProjectDefaults
+{
 <#
 .Synopsis
    Save a .psproj\defaults.clixml file.  This will allow you to skip the -ProjectFile parameter and sets the default IncludeInBuild option for adding items to the project.
@@ -426,10 +432,8 @@ function Save-PowershellProject
 PS> $default = "" | Select-Object ProjectFile,IncludeInBuild
 PS> $defualt.ProjectFile = ".\ISEPSProject.psproj"
 PS> $default.IncludeInBuild = $true
-PS> Save-PowershellProjectDefaults -DefaultData $default
+PS> Save-PspPowershellProjectDefaults -DefaultData $default
 #>
-function Save-PowershellProjectDefaults
-{
     [CmdletBinding()]
     Param
     (
@@ -451,6 +455,9 @@ function Save-PowershellProjectDefaults
     {
     }
 }
+
+function Get-PspPowershellProjectDefaultProjectFile
+{
 <#
 .Synopsis
    Extract the ProjectFile default from .psproj\defaults.clixml file.
@@ -459,10 +466,8 @@ function Save-PowershellProjectDefaults
 
 .EXAMPLE
 For Use in [Parameters]
-   $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+   $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
 #>
-function Get-PowershellProjectDefaultProjectFile
-{
     [CmdletBinding()]
     Param
     (       
@@ -490,6 +495,9 @@ function Get-PowershellProjectDefaultProjectFile
     {
     }
 }
+
+function Get-PspPowershellProjectFunctions
+{
 <#
 .Synopsis
    Gets a list of the commands (function) inside of the source files contained in the .psproj file.
@@ -497,72 +505,70 @@ function Get-PowershellProjectDefaultProjectFile
    Generate a list of commands (function) with their containing source file information.
 
 .EXAMPLE
-PS> Get-PowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj | Sort-Object -Property SourceFile,FunctionName
+PS> Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj | Sort-Object -Property SourceFile,FunctionName
 
 FunctionName                               SourceFile                            
 ------------                               ----------                            
-Add-SourceToPowershellProject              Add-SourceToPowershellProject.ps1     
-Build-PowershellProject                    Build-PowershellProject.ps1           
-Clean-PowershellProject                    Clean-PowershellProject.ps1           
-Close-PowershellProject                    Close-PowershellProject.ps1           
-Compare-PowershellProjectBackup            Compare-PowershellProjectBackup.ps1   
-Create-PowershellProject                   Create-PowershellProject.ps1          
-Get-PowershellProject                      Get-PowershellProject.ps1             
-Get-PowershellProjectBackup                Get-PowershellProjectBackup.ps1       
-Open-PowershellProject                     Open-PowershellProject.ps1            
-Remove-SourceFromPowershellProject         Remove-SourceFromPowershellProject.ps1
-Set-IncludeInBuildFlagForSource            Set-IncludeInBuildFlagForSource.ps1   
-Set-PowershellProjectDefaults              Set-PowershellProjectDefaults.ps1     
-Get-CSVFromStringArray                     UtilityFunctions.ps1                  
-Get-PowershellProjectBackupData            UtilityFunctions.ps1                  
-Get-PowershellProjectCurrentVersion        UtilityFunctions.ps1                  
-Get-PowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
-Get-PowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
-Get-PowershellProjectFunctions             UtilityFunctions.ps1                  
-Get-PowershellProjectVersion               UtilityFunctions.ps1                  
-Save-PowershellProject                     UtilityFunctions.ps1                  
-Save-PowershellProjectDefaults             UtilityFunctions.ps1                  
-Update-PowershellProjectVersion            UtilityFunctions.ps1               
+Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
+Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
+Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
+Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
+Compare-PspPowershellProjectBackup            Compare-PspPowershellProjectBackup.ps1   
+New-PspPowershellProject                   New-PspPowershellProject.ps1          
+Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
+Get-PspPowershellProjectBackup                Get-PspPowershellProjectBackup.ps1       
+Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
+Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
+Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
+Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
+Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
+Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
+Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
+Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
+Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
+Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
+Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
+Save-PspPowershellProject                     UtilityFunctions.ps1                  
+Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
+Update-PspPowershellProjectVersion            UtilityFunctions.ps1               
 
 .EXAMPLE
-PS> Get-PowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName
+PS> Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName
 
 FunctionName                               SourceFile                            
 ------------                               ----------                            
-Add-SourceToPowershellProject              Add-SourceToPowershellProject.ps1     
-Build-PowershellProject                    Build-PowershellProject.ps1           
-Clean-PowershellProject                    Clean-PowershellProject.ps1           
-Close-PowershellProject                    Close-PowershellProject.ps1           
-Create-PowershellProject                   Create-PowershellProject.ps1          
-Get-PowershellProject                      Get-PowershellProject.ps1             
-Open-PowershellProject                     Open-PowershellProject.ps1            
-Remove-SourceFromPowershellProject         Remove-SourceFromPowershellProject.ps1
-Set-IncludeInBuildFlagForSource            Set-IncludeInBuildFlagForSource.ps1   
-Set-PowershellProjectDefaults              Set-PowershellProjectDefaults.ps1     
-Get-CSVFromStringArray                     UtilityFunctions.ps1                  
-Get-PowershellProjectBackupData            UtilityFunctions.ps1                  
-Get-PowershellProjectCurrentVersion        UtilityFunctions.ps1                  
-Get-PowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
-Get-PowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
-Get-PowershellProjectFunctions             UtilityFunctions.ps1                  
-Get-PowershellProjectVersion               UtilityFunctions.ps1                  
-Save-PowershellProject                     UtilityFunctions.ps1                  
-Save-PowershellProjectDefaults             UtilityFunctions.ps1                  
-Update-PowershellProjectVersion            UtilityFunctions.ps1                  
+Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
+Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
+Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
+Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
+New-PspPowershellProject                   New-PspPowershellProject.ps1          
+Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
+Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
+Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
+Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
+Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
+Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
+Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
+Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
+Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
+Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
+Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
+Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
+Save-PspPowershellProject                     UtilityFunctions.ps1                  
+Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
+Update-PspPowershellProjectVersion            UtilityFunctions.ps1                  
 
 #>
-function Get-PowershellProjectFunctions
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
         ,
         # Switch to only include those source files that have the IncludeInBuild flag set.
         [Parameter(Mandatory=$false,
@@ -583,7 +589,7 @@ function Get-PowershellProjectFunctions
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -636,6 +642,9 @@ function Get-PowershellProjectFunctions
         }
     }
 }
+
+function Get-PspPowershellProjectDefaultIncludeInBuild
+{
 <#
 .Synopsis
    Extract the IncludeInBuild default from .psproj\defaults.clixml file.
@@ -644,10 +653,8 @@ function Get-PowershellProjectFunctions
 
 .EXAMPLE
 For Use in [Parameters]
-   $IncludeInBuild = (Get-PowershellProjectDefaultIncludeInBuild)
+   $IncludeInBuild = (Get-PspPowershellProjectDefaultIncludeInBuild)
 #>
-function Get-PowershellProjectDefaultIncludeInBuild
-{
     [CmdletBinding()]
     Param
     (    
@@ -670,22 +677,23 @@ function Get-PowershellProjectDefaultIncludeInBuild
     {
     }
 }
+
+function Get-PspCSVFromStringArray
+{
 <#
 .Synopsis
    Given a [string[]] array, convert it to a CSV formatted string.
 .DESCRIPTION
-   Used by the Build-PowershellProject command to output the FunctionsToExport = line for inclusion in the psd1 file.
+   Used by the Start-PspBuildPowershellProject command to output the FunctionsToExport = line for inclusion in the psd1 file.
 
 .EXAMPLE
-PS> $functionInfo = (Get-PowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName).FunctionName
-PS> Get-CSVFromStringArray -StringArray $functionInfo -SingleQuotes
-'Add-SourceToPowershellProject','Build-PowershellProject','Clean-PowershellProject','Close-PowershellProject','Create-PowershellProject','Get-PowershellProject','Open-PowershellP
-roject','Remove-SourceFromPowershellProject','Set-IncludeInBuildFlagForSource','Set-PowershellProjectDefaults','Get-CSVFromStringArray','Get-PowershellProjectBackupData','Get-Pow
-ershellProjectCurrentVersion','Get-PowershellProjectDefaultIncludeInBuild','Get-PowershellProjectDefaultProjectFile','Get-PowershellProjectFunctions','Get-PowershellProjectVersio
-n','Save-PowershellProject','Save-PowershellProjectDefaults','Update-PowershellProjectVersion'
+PS> $functionInfo = (Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName).FunctionName
+PS> Get-PspCSVFromStringArray -StringArray $functionInfo -SingleQuotes
+'Add-PspSourceToPowershellProject','Start-PspBuildPowershellProject','Repair-PspPowershellProject','Close-PspPowershellProject','New-PspPowershellProject','Get-PspPowershellProject','Open-PowershellP
+roject','Remove-PspSourceFromPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Get-PspCSVFromStringArray','Get-PspPowershellProjectBackupData','Get-Pow
+ershellProjectCurrentVersion','Get-PspPowershellProjectDefaultIncludeInBuild','Get-PspPowershellProjectDefaultProjectFile','Get-PspPowershellProjectFunctions','Get-PspPowershellProjectVersio
+n','Save-PspPowershellProject','Save-PspPowershellProjectDefaults','Update-PspPowershellProjectVersion'
 #>
-function Get-CSVFromStringArray
-{
     [CmdletBinding()]
     Param
     (
@@ -724,17 +732,17 @@ function Get-CSVFromStringArray
         Write-Output $csvLine
     }
 }
+
+function Get-PspISETabNameFromPath_Old
+{
 <#
 .Synopsis
-   Returns the most current version of .psproj files.
+    Given an ISEProject item, extract the TAB name from the Path.   
 .DESCRIPTION
-   Returns the lastest version of the .psproj files supported by the code.
-
+   
 .EXAMPLE
-   Get-PowershellProjectCurrentVersion
+    
 #>
-function Get-ISETabNameFromPath
-{
     [CmdletBinding()]
     Param
     (
@@ -750,7 +758,7 @@ function Get-ISETabNameFromPath
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
     )
 
     Begin
@@ -775,5 +783,39 @@ function Get-ISETabNameFromPath
     }
     End
     {
+    }
+}
+
+Function Get-PspPowershellProjectFilesNotIncludedInProject
+{
+<#
+.Synopsis
+    Display the files in the PROJECT directory that haven't been added as a source.   
+.DESCRIPTION
+   
+.EXAMPLE
+    
+#>
+    $projectFiles = @{}
+
+    $psFiles = Get-ChildItem -Filter *.ps1 -Recurse
+    $pspKeys = Get-PspPowershellProjectKeys | Sort-Object
+    foreach ( $p in $pspKeys )
+    {
+        $f = Get-ChildItem $p
+        $projectFiles.Add($f.FullName,$p)
+    }
+    
+    foreach ( $p in $psFiles ) 
+    { 
+        if ( -not ( $p.FullName.Contains("\bin\") ) )
+        {
+            #Write-Verbose $p.FullName -Verbose
+            #Write-Verbose $projectFiles.ContainsKey($p.FullName) -Verbose
+            if ( -Not ( $projectFiles.ContainsKey($p.FullName) ) ) 
+            {
+                Write-Output "Missing: $($p.FullName)" 
+            }
+        }
     }
 }

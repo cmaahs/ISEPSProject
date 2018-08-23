@@ -1,3 +1,5 @@
+function Get-PspPowershellProjectBackupData
+{
 <#
 .Synopsis
    Gets the BACKUP Data from a .psproj file.
@@ -5,7 +7,7 @@
    Returns a hash table of backup data.
 
 .EXAMPLE
-PS> $backupData = Get-PowershellProjectBackupData -ProjectFile ISEPSProject.psproj
+PS> $backupData = Get-PspPowershellProjectBackupData -ProjectFile ISEPSProject.psproj
 PS> $backupData
 Name                           Value                                                                                                                                             
 ----                           -----                                                                                                                                             
@@ -20,18 +22,16 @@ Name                           Value
 2017-08-28_144227              {<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">,   <Obj ...
 
 #>
-function Get-PowershellProjectBackupData
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=0)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
         ,
         # Switch to return ALL backups, instead of the previous 9.
         [Parameter(Mandatory=$false,
@@ -51,7 +51,7 @@ function Get-PowershellProjectBackupData
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -92,6 +92,9 @@ function Get-PowershellProjectBackupData
         }
     }
 }
+
+function Save-PspPowershellProject
+{
 <#
 .Synopsis
    Save a .psproj file.
@@ -99,24 +102,22 @@ function Get-PowershellProjectBackupData
    This process saves, and optionally stores backups within the NTFS streams of the file.
 
 .EXAMPLE
-PS> $projectData = Get-PowershellProject -ProjectFile ISEPSProject.psproj 
-PS> Save-PowershellProject -ProjectFile ISEPSProject.psproj -ProjectData $projectData
+PS> $projectData = Get-PspPowershellProject -ProjectFile ISEPSProject.psproj 
+PS> Save-PspPowershellProject -ProjectFile ISEPSProject.psproj -ProjectData $projectData
 
 #>
-function Save-PowershellProject
-{
     [CmdletBinding()]
     Param
     (
-        # Specify the project file to open.  Default project can be specified via the Set-PowershellProjectDefaults command.
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
                    Position=2)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       
-        $ProjectFile = (Get-PowershellProjectDefaultProjectFile)
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
         ,
-        #backup data gathered from the Get-PowershellProjectBackupData command.
+        #backup data gathered from the Get-PspPowershellProjectBackupData command.
         [Parameter(Mandatory=$false,
                    Position=1)]
         [Hashtable]
@@ -140,7 +141,7 @@ function Save-PowershellProject
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -151,9 +152,9 @@ function Save-PowershellProject
             if ( $SkipBackup -eq $false )
             {
                 $bakProjectData = Get-Content -Path $ProjectFile
-                $backupData = Get-PowershellProjectBackupData $ProjectFile
+                $backupData = Get-PspPowershellProjectBackupData $ProjectFile
             } else {
-                $backupData = Get-PowershellProjectBackupData $ProjectFile -AllBackups
+                $backupData = Get-PspPowershellProjectBackupData $ProjectFile -AllBackups
             }
 
             $projectData | Export-Clixml -Path $ProjectFile -Force

@@ -1,14 +1,14 @@
-﻿<#
+﻿function Get-PspPowershellProjectCurrentVersion
+{
+<#
 .Synopsis
    Returns the most current version of .psproj files.
 .DESCRIPTION
    Returns the lastest version of the .psproj files supported by the code.
 
 .EXAMPLE
-   Get-PowershellProjectCurrentVersion
+   Get-PspPowershellProjectCurrentVersion
 #>
-function Get-PowershellProjectCurrentVersion
-{
     [CmdletBinding()]
     Param
     (        
@@ -20,7 +20,7 @@ function Get-PowershellProjectCurrentVersion
     Process
     {        
         $item = "" | Select-Object CurrentVersion
-        $item.CurrentVersion = "1.1"
+        $item.CurrentVersion = "1.2"
         Write-Output $item
    }
     End
@@ -28,6 +28,8 @@ function Get-PowershellProjectCurrentVersion
     }
 }
 
+function Get-PspPowershellProjectVersion
+{
 <#
 .Synopsis
    Get the .psproj data version
@@ -35,15 +37,13 @@ function Get-PowershellProjectCurrentVersion
    Returns the version of the .psproj data
 
 .EXAMPLE
-PS> Get-PowershellProjectVersion -ProjectFile ISEPSProject.psproj
+PS> Get-PspPowershellProjectVersion -ProjectFile ISEPSProject.psproj
 
 Version CurrentVersion IsLatest
 ------- -------------- --------
 1.1     1.1                True
 
 #>
-function Get-PowershellProjectVersion
-{
     [CmdletBinding()]
     Param
     (
@@ -61,7 +61,7 @@ function Get-PowershellProjectVersion
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -71,7 +71,7 @@ function Get-PowershellProjectVersion
         {
             $projectData = Import-Clixml -Path $ProjectFile
             $item = "" | Select-Object Version,CurrentVersion,IsLatest
-            $item.CurrentVersion = (Get-PowershellProjectCurrentVersion).CurrentVersion
+            $item.CurrentVersion = (Get-PspPowershellProjectCurrentVersion).CurrentVersion
             $item.IsLatest = $false
         
             if ( $projectData.ContainsKey("ISEPSProjectDataVersion") )
@@ -94,6 +94,9 @@ function Get-PowershellProjectVersion
         }
     }
 }
+
+function Update-PspPowershellProjectVersion
+{
 <#
 .Synopsis
    Process to upgrade from a previous version to current.
@@ -101,15 +104,13 @@ function Get-PowershellProjectVersion
    When the existing .psproj file is not at the current version, calling this command will upgrade all previous version to the current version.
 
 .EXAMPLE
-PS> Update-PowershellProjectVersion -ProjectFile ISEPSProject.psproj
+PS> Update-PspPowershellProjectVersion -ProjectFile ISEPSProject.psproj
 
 UpgradeNeeded UpgradeStatus    
 ------------- -------------    
          True Updated to latest
 
 #>
-function Update-PowershellProjectVersion
-{
     [CmdletBinding()]
     Param
     (
@@ -127,7 +128,7 @@ function Update-PowershellProjectVersion
                 $continueProcessing = $false
             }        
         } else {
-            Write-Warning "Must specify the -ProjectFile, or use Set-PowershellProjectDefaults command to set a default ProjectFile"
+            Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
         }
     }
@@ -137,7 +138,7 @@ function Update-PowershellProjectVersion
         {
             $projectData = Import-Clixml -Path $ProjectFile
 
-            $dataVersion = Get-PowershellProjectVersion -ProjectFile $ProjectFile
+            $dataVersion = Get-PspPowershellProjectVersion -ProjectFile $ProjectFile
             $item = "" | Select-Object UpgradeNeeded,UpgradeStatus
 
             if ( $dataVersion.Version -ne $dataVersion.CurrentVersion ) 
@@ -158,12 +159,42 @@ function Update-PowershellProjectVersion
                 }
 
 
-                if ( ( $dataVersion.Version -eq "1.1" ) -and ( $continueProcessing -eq $true ) )
+                if ( ( $dataVersion.Version -eq "1.2" ) -and ( $continueProcessing -eq $true ) )
                 {
                     #current version
                     $item.UpgradeNeeded = $false
                     $item.UpgradeStatus = "Current"
                     $continueProcessing = $false
+                }
+                if ( ( $dataVersion.Version -eq "1.1" ) -and ( $continueProcessing -eq $true ) )
+                {
+                    #upgrade from 1.1
+                    Write-Verbose "Update from 1.1"
+                    $projectData["ISEPSProjectDataVersion"] = "1.2"
+
+                    if ( $ProjectFile.StartsWith(".\") )
+                    {
+                        $projectFileKey = $ProjectFile.SubString(2)
+                    }    
+                    $newProjectData = @{}
+                    foreach ( $key in $projectData.Keys )
+                    {
+                        if ( ( $key -ne $projectFileKey ) -and ( $key -ne "ISEPSProjectDataVersion" ) ) 
+                        {
+                            $newStruct = "" | Select-Object FileName,ProjectTab,IncludeInBuild,ReadMeOrder
+                            $newStruct.FileName = $projectData[$key].FileName
+                            $newStruct.ProjectTab = $projectData[$key].ProjectTab
+                            $newStruct.IncludeInBuild = $projectData[$key].IncludeInBuild
+                            $newStruct.ReadMeOrder = "99"
+                            $newProjectData.Add($key, $newStruct)
+                        } else {
+                            $newProjectData.Add($key, $projectData[$key])
+                        }
+                    }
+                    $item.UpgradeNeeded = $true
+                    $item.UpgradeStatus = "Updated to latest"
+                    $continueProcessing = $true
+                    
                 }
                 if ( ( $dataVersion.Version -eq "1.0" ) -and ( $continueProcessing -eq $true ) )
                 {
