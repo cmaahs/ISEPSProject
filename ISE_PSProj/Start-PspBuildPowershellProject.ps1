@@ -84,6 +84,12 @@ ojectFunctions','Get-PspPowershellProjectVersion','Save-PspPowershellProject','S
                 $projectData.Remove("ISEPSProjectDataVersion")
             }
            
+            $preBuildCommand = (Get-PspPowershellProjectDefaultPreBuildCommand)
+            if ( $preBuildCommand.Length -gt 0 )
+            {   
+                $sb = [ScriptBlock]::Create($preBuildCommand)             
+                Invoke-Command -NoNewScope -ScriptBlock $sb
+            }
             if ( $buildStyle -eq "SingleFileStyle" )
             {
                 $readmeData = @{}

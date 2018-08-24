@@ -65,6 +65,35 @@ Function Open-PspPowershellProject
                 $projectData.Remove("ISEPSProjectDataVersion")
             }
 
+            $newTab = $psISE.PowerShellTabs.Add()
+            $newTab.DisplayName = "Project Code Tools"
+            $pwd = Get-Location
+            Start-Sleep -Seconds 2
+            Write-Verbose "Setting default location for $($item_tab)"
+            $newTab.Invoke("Set-Location $pwd")
+            $codeTools = @'
+#Start-PspBuildPowershellProject -Force -Verbose
+
+
+$newTab = $psISE.PowerShellTabs.Add()
+$newTab.DisplayName = "Module Test"
+$pwd = Get-Location
+Start-Sleep -Seconds 2
+Write-Verbose "Setting default location for $($item_tab)"
+$newTab.Invoke("Set-Location $pwd")
+$text = @"
+Import-Module $((Get-Location).Path.Split("\")[-1]).psm1
+#some commands here, possibly add commands to the .psproj directory to populate here.
+"@
+$newTab.ExpandedScript = $true
+Start-Sleep -Seconds 2
+$newTab.Files[0].Editor.Text = $text
+'@
+            $newTab.ExpandedScript = $true
+            Start-Sleep -Seconds 2
+            $newTab.Files[0].Editor.Text = $codeTools
+
+
             $tab = ($projectData.Values | Select-Object -Property ProjectTab | Sort-Object -Property ProjectTab -Unique).ProjectTab
             foreach ( $item_tab in $tab ) 
             {
@@ -72,7 +101,7 @@ Function Open-PspPowershellProject
                 $newTab = $psISE.PowerShellTabs.Add()
                 $newTab.DisplayName = $item_tab            
 
-                $sourceFile = $projectData.GetEnumerator() | Where-Object { $_.Value.ProjectTab -eq $item_tab }
+                $sourceFile = $projectData.GetEnumerator() | Where-Object { $_.Value.ProjectTab -eq $item_tab } | Sort-Object -Property Name
                 foreach ( $item_sourceFile in $sourceFile ) 
                 {
                     Write-Verbose "Opening: $(Get-Location)\$($item_sourceFile.Name)"

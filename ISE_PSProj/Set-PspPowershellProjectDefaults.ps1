@@ -28,6 +28,7 @@ LocalDeployDirectory : C:\Program Files\WindowsPowerShell\Modules\ISEPSProject
 ModuleInitFile       : .\ISE_PSProj\Module_Init.ps1
 ModulePSDFile        : .\ISE_PSProj\ISEPSProject.psd1
 ModuleREADMEFile     : .\ISE_PSProj\README.md
+PreBuildCommand      : Add-PSAddin SwisAddIn; Get-Help Connect-Swis -Full
 
 .EXAMPLE
 Set the Build Style of the project.  Single PSM1 file, or an Include PSM1 file that imports single PS1 files.
@@ -103,6 +104,11 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
                    Position=6)]
         [ValidateScript( { ( ( $_.ZipFile -eq "" ) -or (Test-Path $_.ZipFile) ) } )]        
         $ModuleAdditionalZipFile
+        ,
+        # Add a command to run prior to starting a build.
+        [Parameter(Mandatory=$false,
+                   Position=7)]
+        $PreBuildCommand
     )
 
     Begin
@@ -123,7 +129,7 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
             {
                 New-Item -Path ".\.psproj" -ItemType Directory
                 #create new
-                $defaults = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle,LocalDeployDirectory,ModuleInitFile,ModuleREADMEFile,ModuleAdditionalZipFile
+                $defaults = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle,LocalDeployDirectory,ModuleInitFile,ModuleREADMEFile,ModuleAdditionalZipFile,PreBuildCommand
                 if ( ( $ProjectFile -ne "" ) -and ( Test-Path $ProjectFile ) ) 
                 {
                     $defaults.ProjectFile = $ProjectFile
@@ -159,7 +165,11 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
                 if ( $ModuleAdditionalZipFile ) 
                 {
                     $defaults.ModuleAdditionalZipFile = "$($ModuleAdditionalZipFile.ZipFile)|$($ModuleAdditionalZipFile.RelativeInstallPath)"
-                }                       
+                }     
+                if ( $PreBuildCommand.Length -gt 0 )
+                {
+                    $defaults.PreBuildCommand = $PreBuildCommand
+                }                  
             } else {
                 if ( Test-Path ".\.psproj\defaults.clixml" )
                 {
@@ -287,10 +297,28 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
                             }
                         }                                               
                     }
+                    if ( ( $PreBuildCommand -eq "-" ) -or ( $PreBuildCommand.Length -gt 0 ) )
+                    {
+                        if ([bool]($defaults.PSobject.Properties.Name -match "PreBuildCommand")) 
+                        {
+                            if ( $PreBuildCommand -eq "-" )
+                            {
+                                $defaults.PreBuildCommand = ""
+                            } else {
+                                $defaults.PreBuildCommand = $PreBuildCommand
+                            }
+                        } else {                       
+                            if ( -not ( $PreBuildCommand -eq "-" ) ) 
+                            {
+                                Add-Member -InputObject $defaults -MemberType NoteProperty -Name PreBuildCommand -Value "$($PreBuildCommand)"
+                            }
+                        }                                               
+                    }
+
                     
                 } else {
                     #create new
-                    $defaults = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle,LocalDeployDirectory,ModuleInitFile,ModuleREADMEFile,ModuleAdditionalZipFile
+                    $defaults = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle,LocalDeployDirectory,ModuleInitFile,ModuleREADMEFile,ModuleAdditionalZipFile,PreBuildCommand
                     if ( ( $ProjectFile -ne "" ) -and ( Test-Path $ProjectFile ) ) 
                     {
                         $defaults.ProjectFile = $ProjectFile
@@ -326,6 +354,10 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
                     if ( $ModuleAdditionalZipFile )
                     {
                         $defaults.ModuleAdditionalZipFile = "$($ModuleAdditionalZipFile.ZipFile)|$($ModuleAdditionalZipFile.RelativeInstallPath)"
+                    }
+                    if ( $PreBuildCommand.Length -gt - 0 )
+                    {
+                        $defaults.PreBuildCommand = $PreBuildCommand
                     }
                 }
             }
