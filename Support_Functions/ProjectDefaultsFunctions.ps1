@@ -1,4 +1,8 @@
-﻿Function Get-PspPowershellProjectDefaults
+﻿<#
+These functions have been moved to the PSProj_Defaults tab.
+#>
+
+Function Get-PspPowershellProjectDefaults
 {
 <#
 .Synopsis

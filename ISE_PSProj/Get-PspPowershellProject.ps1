@@ -56,32 +56,52 @@ New-PspPowershellProject.ps1           @{FileName=New-PspPowershellProject.ps1; 
     {
         if ( $continueProcessing -eq $true ) 
         {
-            $projectData = Import-Clixml -Path $ProjectFile
+            if ( (Get-PspPowershellProjectVersion -ProjectFile $ProjectFile).IsLatest -eq $true )
+            {                
+                # version 1.3 and later.
+                $projectData = Get-PspProjectData # Import-Clixml -Path $ProjectFile
 
-            if ( $ProjectFile.StartsWith(".\") )
-            {
-                $projectFileKey = $ProjectFile.SubString(2)
+                $projectDataValues = @()            
+                foreach ( $key in $projectData.Keys )
+                {
+                    $item = "" | Select-Object ProjectTab,FileName,IncludeInBuild,ReadMeOrder
+                    $item.ProjectTab = $projectData[$key].ProjectTab
+                    $item.FileName = $projectData[$key].FileName
+                    $item.IncludeInBuild = $projectData[$key].IncludeInBuild
+                    $item.ReadMeOrder = $projectData[$key].ReadMeOrder
+                    $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
+                    $projectDataValues += $item                
+                }
+
             } else {
-                $projectFileKey = $ProjectFile
-            }
-            if ( $projectData.ContainsKey($projectFileKey) )
-            {
-                $projectData.Remove($projectFileKey)
-            }
-            if ( $projectData.ContainsKey("ISEPSProjectDataVersion") )
-            {
-                $projectData.Remove("ISEPSProjectDataVersion")
-            }
-            $projectDataValues = @()            
-            foreach ( $key in $projectData.Keys )
-            {
-                $item = "" | Select-Object ProjectTab,FileName,IncludeInBuild,ReadMeOrder
-                $item.ProjectTab = $projectData[$key].ProjectTab
-                $item.FileName = $projectData[$key].FileName
-                $item.IncludeInBuild = $projectData[$key].IncludeInBuild
-                $item.ReadMeOrder = $projectData[$key].ReadMeOrder
-                $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
-                $projectDataValues += $item                
+                # version pre 1.3
+                $projectData = Import-Clixml -Path $ProjectFile
+
+                if ( $ProjectFile.StartsWith(".\") )
+                {
+                    $projectFileKey = $ProjectFile.SubString(2)
+                } else {
+                    $projectFileKey = $ProjectFile
+                }
+                if ( $projectData.ContainsKey($projectFileKey) )
+                {
+                    $projectData.Remove($projectFileKey)
+                }
+                if ( $projectData.ContainsKey("ISEPSProjectDataVersion") )
+                {
+                    $projectData.Remove("ISEPSProjectDataVersion")
+                }
+                $projectDataValues = @()            
+                foreach ( $key in $projectData.Keys )
+                {
+                    $item = "" | Select-Object ProjectTab,FileName,IncludeInBuild,ReadMeOrder
+                    $item.ProjectTab = $projectData[$key].ProjectTab
+                    $item.FileName = $projectData[$key].FileName
+                    $item.IncludeInBuild = $projectData[$key].IncludeInBuild
+                    $item.ReadMeOrder = $projectData[$key].ReadMeOrder
+                    $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
+                    $projectDataValues += $item                
+                }
             }
             Write-Output $projectDataValues | Sort-Object -Property ProjectTab,FileName
         } #continue processing

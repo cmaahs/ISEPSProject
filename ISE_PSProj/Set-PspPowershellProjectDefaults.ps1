@@ -102,7 +102,7 @@ Set the Module Init file.  This is a PS1 file that will be RUN upon loading (Imp
         # Add a ZIP file
         [Parameter(Mandatory=$false,
                    Position=6)]
-        [ValidateScript( { ( ( $_.ZipFile -eq "" ) -or (Test-Path $_.ZipFile) ) } )]        
+        [ValidateScript( { ( ( $_.ZipFile -eq "-" ) -or ( Test-Path $_.ZipFile ) ) } )]        
         $ModuleAdditionalZipFile
         ,
         # Add a command to run prior to starting a build.

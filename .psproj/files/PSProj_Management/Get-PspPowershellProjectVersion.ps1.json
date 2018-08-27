@@ -1,0 +1,6 @@
+{
+    "FileName":  "PSProj_Management\\Get-PspPowershellProjectVersion.ps1",
+    "ProjectTab":  "PSProj_Management",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  999
+}

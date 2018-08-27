@@ -12,7 +12,7 @@
 RootModule = '.\ISEPSProject.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.3.15'
+ModuleVersion = '1.4.0'
 
 # ID used to uniquely identify this module
 GUID = 'f041d119-4241-4d6b-bdf4-ab1e308542e2'
@@ -66,7 +66,7 @@ PowerShellVersion = '3.0'
 # NestedModules = @()
 
 # Functions to export from this module
-FunctionsToExport = @('Add-PspSourceToPowershellProject','Close-PspPowershellProject','Get-PspPowershellProject','=','New-PspPowershellProject','Open-PspPowershellProject','Remove-PspSourceFromPowershellProject','Repair-PspPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Set-PspReadMeOrderForSource','Start-PspBuildPowershellProject','Start-PspBuildSourceFileFromPowershellProject','Start-PspDeployPowershellProject','Compare-PspPowershellProjectBackup','Get-PspPowershellProjectBackup','Restore-PspPowershellProjectBackup','Get-PspRelativePathFromProjectRoot','Start-IsePsPublishToEvcNuGet','Get-PspPowershellProjectDefaults','New-PspIsePsZipInstallDetails','Get-PspPowershellProjectFilesNotIncludedInProject','Get-PspPowershellProjectFunctions','Set-Psp','Start-Psp')
+FunctionsToExport = @('Set-Psp','Start-Psp','Add-PspSourceToPowershellProject','Close-PspPowershellProject','Get-PspPowershellProject','New-PspPowershellProject','Open-PspPowershellProject','Remove-PspSourceFromPowershellProject','Repair-PspPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Set-PspReadMeOrderForSource','Start-PspBuildPowershellProject','Start-PspBuildSourceFileFromPowershellProject','Start-PspDeployPowershellProject','Compare-PspPowershellProjectBackup','Get-PspPowershellProjectBackup','Restore-PspPowershellProjectBackup','Get-PspPowershellProjectDefaults','New-PspIsePsZipInstallDetails','Get-PspPowershellProjectFilesNotIncludedInProject','Get-PspPowershellProjectFunctions','Get-PspProjectData','Save-PspProjectData','Get-PspControlDirectory','Get-PspRelativePathFromProjectRoot','Start-IsePsPublishToEvcNuGet')
 
 # Cmdlets to export from this module
 CmdletsToExport = '*'
@@ -105,6 +105,10 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = @'
+1.4.0  - Complete rethink.  Using .clixml based files was fine for individual use, however those file types aren't playing well with Git.
+       - Going to migrate away from a single {ProjectName}.psproj in .clixml format to a directory inside of .psproj to track project 
+       - files.  Each file will have it's own JSON file containing it's properties.
+       - The project defaults file will also be converted to JSON in hopes that everything will play nicer in a multi-developer project.
 1.3.15 - Scoping problem fixed.
 1.3.14 - Adding pre-build command support.
 1.3.13 - Adding verbose to help build.

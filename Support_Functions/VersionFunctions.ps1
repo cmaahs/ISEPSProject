@@ -1,4 +1,8 @@
-﻿function Get-PspPowershellProjectCurrentVersion
+﻿<#
+These functions have bee moved to the PSProj_Management Tab.
+#>
+
+function Get-PspPowershellProjectCurrentVersion
 {
 <#
 .Synopsis

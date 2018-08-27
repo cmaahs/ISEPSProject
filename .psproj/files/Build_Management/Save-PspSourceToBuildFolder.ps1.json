@@ -1,0 +1,6 @@
+{
+    "FileName":  "Build_Management\\Save-PspSourceToBuildFolder.ps1",
+    "ProjectTab":  "Build_Management",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  999
+}

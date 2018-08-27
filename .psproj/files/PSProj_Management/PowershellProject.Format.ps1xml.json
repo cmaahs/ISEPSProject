@@ -1,0 +1,6 @@
+{
+    "FileName":  "PSProj_Management\\PowershellProject.Format.ps1xml",
+    "ProjectTab":  "PSProj_Management",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  999
+}

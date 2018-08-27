@@ -1,0 +1,6 @@
+{
+    "FileName":  "Support_Functions\\ProjectDefaultsFunctions.ps1",
+    "ProjectTab":  "Support_Functions",
+    "IncludeInBuild":  false,
+    "ReadMeOrder":  110
+}

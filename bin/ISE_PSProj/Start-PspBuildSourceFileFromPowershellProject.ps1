@@ -17,7 +17,7 @@ Import the built PS1 file into your session with:
     (   
         # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
         [Parameter(Mandatory=$false,
-                   Position=0)]
+                   Position=1)]
         [Alias('File','FilePath')]
         #[ValidateScript({ Test-Path $_ })]
         [string]       

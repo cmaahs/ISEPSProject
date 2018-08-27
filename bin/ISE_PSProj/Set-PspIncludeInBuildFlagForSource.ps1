@@ -185,42 +185,85 @@ New-PspPowershellProject.ps1           ISE PSProj                  True
             {
                 Update-PspPowershellProjectVersion -ProjectFile $ProjectFile
             }
-            $projectData = Import-Clixml -Path $ProjectFile
 
-            $updatedItems = 0
-            $notFoundItems = 0  
-            $keyToUpdate = @()      
-            foreach ($item_SourceFile in $m_SourceFileList)
-            {
-                if ( $item_SourceFile.StartsWith(".\") )
+            if ( (Get-PspPowershellProjectVersion -ProjectFile $ProjectFile).IsLatest -eq $true )
+            {                
+                # version 1.3 and later.
+                $projectData = Get-PspProjectData # Import-Clixml -Path $ProjectFile
+
+                $updatedItems = 0
+                $notFoundItems = 0  
+                $keyToUpdate = @()      
+                foreach ($item_SourceFile in $m_SourceFileList)
                 {
-                    $item_SourceFile = $item_SourceFile.SubString(2)
-                }        
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
            
-                if ( $projectData.ContainsKey($item_SourceFile) )
-                {
-                    $keyToUpdate += $item_SourceFile
-                } else {
-                    $notFoundItems++
+                    if ( $projectData.ContainsKey($item_SourceFile) )
+                    {
+                        $keyToUpdate += $item_SourceFile
+                    } else {
+                        $notFoundItems++
+                    }
                 }
-            }
-            foreach ( $item_keyToUpdate in $keyToUpdate )
-            {
-                $item = $projectData[$item_keyToUpdate]
-                if ( $Include -eq $true ) 
+                $controlDirectory = Get-PspControlDirectory
+                foreach ( $item_keyToUpdate in $keyToUpdate )
                 {
-                    $item.IncludeInBuild = $true
+                    $item = $projectData[$item_keyToUpdate]
+                    if ( $Include -eq $true ) 
+                    {
+                        $item.IncludeInBuild = $true
+                    }
+                    if ( $Exclude -eq $true ) 
+                    {
+                        $item.IncludeInBuild = $false
+                    }
+                    $projectData[$item_keyToUpdate] = $item
+                    Write-Verbose "Updating key: $($item_keyToUpdate)"
+                    $ProjectData[$item_keyToUpdate] | ConvertTo-Json | Out-File -FilePath "$($controlDirectory)\.psproj\files\$($item_keyToUpdate).json" -Encoding ascii
+                    $updatedItems++
                 }
-                if ( $Exclude -eq $true ) 
-                {
-                    $item.IncludeInBuild = $false
-                }
-                $projectData[$item_keyToUpdate] = $item
-                $updatedItems++
-            }
 
-            Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
-        
+            } else {
+                # versions pre 1.3
+                $projectData = Import-Clixml -Path $ProjectFile
+
+                $updatedItems = 0
+                $notFoundItems = 0  
+                $keyToUpdate = @()      
+                foreach ($item_SourceFile in $m_SourceFileList)
+                {
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
+           
+                    if ( $projectData.ContainsKey($item_SourceFile) )
+                    {
+                        $keyToUpdate += $item_SourceFile
+                    } else {
+                        $notFoundItems++
+                    }
+                }
+                foreach ( $item_keyToUpdate in $keyToUpdate )
+                {
+                    $item = $projectData[$item_keyToUpdate]
+                    if ( $Include -eq $true ) 
+                    {
+                        $item.IncludeInBuild = $true
+                    }
+                    if ( $Exclude -eq $true ) 
+                    {
+                        $item.IncludeInBuild = $false
+                    }
+                    $projectData[$item_keyToUpdate] = $item
+                    $updatedItems++
+                }
+                Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+            } # end version 1.3 check
+                    
             Write-Output "$($updatedItems) source file(s) have been updated in the project"
             Write-Output "$($notFoundItems) source file(s) were not found in the project"
 

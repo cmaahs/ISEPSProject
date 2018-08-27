@@ -1,4 +1,8 @@
-﻿function Get-PspPowershellProjectCurrentVersion
+﻿<#
+This file has been excluded from build.
+#>
+
+function Get-PspPowershellProjectCurrentVersion
 {
 <#
 .Synopsis
