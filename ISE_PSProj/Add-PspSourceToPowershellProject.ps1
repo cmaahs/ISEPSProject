@@ -123,12 +123,14 @@ New-PspPowershellProject.ps1           @{FileName=New-PspPowershellProject.ps1; 
         <#PINC:SourceFile#>
         <#PINC:PARAMCOMMA#>
         # Name of TAB to place the source file on when opening in ISE via the Open-PspPowershellProject command.
+        <#
         [Parameter(Mandatory=$false,
                    Position=2)]
         [Alias('Tab','TabName')]
         [string]
         $ProjectTab = ""
         ,
+        #>
         # Used to set the ReadMeOrder for the source file.
         [Parameter(Mandatory=$false,
                    Position=3)]
@@ -139,7 +141,14 @@ New-PspPowershellProject.ps1           @{FileName=New-PspPowershellProject.ps1; 
         [Parameter(Mandatory=$false,
                    Position=4)]
         [switch]
-        $IncludeInBuild = (Get-PspPowershellProjectDefaultIncludeInBuild)
+        $IncludeInBuild
+        ,
+        # Flag the source file for exclusion in a module build via Start-PspBuildPowershellProject command.  Default can be set via Set-PspPowershellProjectDefaults command.
+        [Parameter(Mandatory=$false,
+                   Position=5)]
+        [switch]
+        $ExcludeFromBuild
+
     )
 
     Begin
@@ -156,6 +165,18 @@ New-PspPowershellProject.ps1           @{FileName=New-PspPowershellProject.ps1; 
         } else {
             Write-Warning "Must specify the -ProjectFile, or use Set-PspPowershellProjectDefaults command to set a default ProjectFile"
             $continueProcessing = $false
+        }
+        $includeFlag = (Get-PspPowershellProjectDefaultIncludeInBuild)
+        if ( $continueProcessing -eq $true )
+        {
+            if ( $IncludeInBuild )
+            {
+                $includeFlag = $true
+            }
+            if ( $ExcludeFromBuild )
+            {
+                $includeFlag = $false
+            }
         }
 
     }
@@ -194,62 +215,123 @@ New-PspPowershellProject.ps1           @{FileName=New-PspPowershellProject.ps1; 
             {
                 Update-PspPowershellProjectVersion -ProjectFile $ProjectFile
             }
-            $projectData = Import-Clixml -Path $ProjectFile        
 
-            foreach ( $item_SourceFile in $m_SourceFileList )
+            if ( (Get-PspPowershellProjectVersion -ProjectFile $ProjectFile).IsLatest -eq $true )
             {                
-                $okToAdd = $true
-                if ( $ProjectTab -eq "" )
-                {
-                    Write-Verbose "Item_SoureFile: $($item_SourceFile)"
-                    $ProjectTab = Get-PspISETabNameFromPath -ProjectFileItem $item_SourceFile -ProjectFile $ProjectFile
+                # version 1.3 and later.
+                $projectData = Get-PspProjectData #Import-Clixml -Path $ProjectFile
+
+                foreach ( $item_SourceFile in $m_SourceFileList )
+                {                
+                    $okToAdd = $true
+                    # We removed the -ProjectTab parameter so it will be UNSET coming in now.
+                    #if ( $ProjectTab -eq "" )
+                    #{
+                        Write-Verbose "Item_SourceFile: $($item_SourceFile)"
+                        $ProjectTab = Get-PspISETabNameFromPath -ProjectFileItem $item_SourceFile -ProjectFile $ProjectFile
+                        if ( $ProjectTab -eq "" )
+                        {           
+                            $okToAdd = $false      
+                            Write-Warning "Unable to automatically determine -ProjectTab from directory name for $($item_SourceFile)."
+                        }
+                    #}
+                    #check and remove FULL path
+                    $projectRoot = (Get-ChildItem -Path $ProjectFile).Directory.FullName
+                    if ( $item_SourceFile.StartsWith($projectRoot) )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString($projectRoot.Length+1)
+                    }
+                    #check and remove .\ notation.
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
+                    if ( -Not ($projectData.ContainsKey($item_Sourcefile) ) )
+                    {
+                        if ( $okToAdd -eq $true )
+                        {
+                            $item = "" | Select-Object FileName,ProjectTab,IncludeInBuild,ReadMeOrder
+                            $item.FileName = $item_SourceFile
+                            $item.ProjectTab = $ProjectTab
+                            $item.IncludeInBuild = $includeFlag
+                            $item.ReadMeOrder = $ReadMeOrder
+                            $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
+                            $projectData.Add($item_SourceFile, $item)                            
+                            $addCount++
+                        } else {
+                            $skippedCount++
+                        }
+                    } else {
+                        if ( ($projectData.Get_Item($item_Sourcefile)).ProjectTab -eq $ProjectTab )
+                        {
+                            $duplicateCount++
+                        } else {
+                            $item = $projectData.Get_Item($item_Sourcefile)
+                            $item.ProjectTab = $ProjectTab
+                            $projectData.Set_Item($item_Sourcefile, $item)
+                            $updatedCount++
+                        }
+                    }
+                }
+                Save-PspProjectData -ProjectData $projectData
+            } else {
+                # version prior to 1.3
+                $projectData = Import-Clixml -Path $ProjectFile        
+
+                foreach ( $item_SourceFile in $m_SourceFileList )
+                {                
+                    $okToAdd = $true
                     if ( $ProjectTab -eq "" )
-                    {           
-                        $okToAdd = $false      
-                        Write-Warning "Unable to automatically determine -ProjectTab from directory name for $($item_SourceFile)."
-                    }
-                }
-                #check and remove FULL path
-                $projectRoot = (Get-ChildItem -Path $ProjectFile).Directory.FullName
-                if ( $item_SourceFile.StartsWith($projectRoot) )
-                {
-                    $item_SourceFile = $item_SourceFile.SubString($projectRoot.Length+1)
-                }
-                #check and remove .\ notation.
-                if ( $item_SourceFile.StartsWith(".\") )
-                {
-                    $item_SourceFile = $item_SourceFile.SubString(2)
-                }        
-                if ( -Not ($projectData.ContainsKey($item_Sourcefile) ) )
-                {
-                    if ( $okToAdd -eq $true )
                     {
-                        $item = "" | Select-Object FileName,ProjectTab,IncludeInBuild,ReadMeOrder
-                        $item.FileName = $item_SourceFile
-                        $item.ProjectTab = $ProjectTab
-                        $item.IncludeInBuild = $IncludeInBuild
-                        $item.ReadMeOrder = $ReadMeOrder
-                        $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
-                        $projectData.Add($item_SourceFile, $item)
-                        $addCount++
-                    } else {
-                        $skippedCount++
+                        Write-Verbose "Item_SoureFile: $($item_SourceFile)"
+                        $ProjectTab = Get-PspISETabNameFromPath -ProjectFileItem $item_SourceFile -ProjectFile $ProjectFile
+                        if ( $ProjectTab -eq "" )
+                        {           
+                            $okToAdd = $false      
+                            Write-Warning "Unable to automatically determine -ProjectTab from directory name for $($item_SourceFile)."
+                        }
                     }
-                } else {
-                    if ( ($projectData.Get_Item($item_Sourcefile)).ProjectTab -eq $ProjectTab )
+                    #check and remove FULL path
+                    $projectRoot = (Get-ChildItem -Path $ProjectFile).Directory.FullName
+                    if ( $item_SourceFile.StartsWith($projectRoot) )
                     {
-                        $duplicateCount++
+                        $item_SourceFile = $item_SourceFile.SubString($projectRoot.Length+1)
+                    }
+                    #check and remove .\ notation.
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
+                    if ( -Not ($projectData.ContainsKey($item_Sourcefile) ) )
+                    {
+                        if ( $okToAdd -eq $true )
+                        {
+                            $item = "" | Select-Object FileName,ProjectTab,IncludeInBuild,ReadMeOrder
+                            $item.FileName = $item_SourceFile
+                            $item.ProjectTab = $ProjectTab
+                            $item.IncludeInBuild = $includeFlag
+                            $item.ReadMeOrder = $ReadMeOrder
+                            $item.PSObject.TypeNames.Insert(0,"PowershellProject.ProjectData")
+                            $projectData.Add($item_SourceFile, $item)
+                            $addCount++
+                        } else {
+                            $skippedCount++
+                        }
                     } else {
-                        $item = $projectData.Get_Item($item_Sourcefile)
-                        $item.ProjectTab = $ProjectTab
-                        $projectData.Set_Item($item_Sourcefile, $item)
-                        $updatedCount++
+                        if ( ($projectData.Get_Item($item_Sourcefile)).ProjectTab -eq $ProjectTab )
+                        {
+                            $duplicateCount++
+                        } else {
+                            $item = $projectData.Get_Item($item_Sourcefile)
+                            $item.ProjectTab = $ProjectTab
+                            $projectData.Set_Item($item_Sourcefile, $item)
+                            $updatedCount++
+                        }
                     }
                 }
-            }
-
-            Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
-
+                Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+            } # version 1.3 check
+            
             Write-Output "$($addCount) file(s) have been added to the project"
             Write-Output "$($duplicateCount) duplicate file(s) have been skipped"
             Write-Output "$($updatedCount) source file(s) have had their TAB locations updated"

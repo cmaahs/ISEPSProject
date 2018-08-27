@@ -1,4 +1,8 @@
-﻿function New-PspIncludeBasedModuleFile
+﻿<#
+These files have been moved to the Build_Management Tab.
+#>
+
+function New-PspIncludeBasedModuleFile
 {
 <#
 .Synopsis

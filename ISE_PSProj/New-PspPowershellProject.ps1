@@ -2,12 +2,22 @@
 {
 <#
 .Synopsis
-   Create an empty .psproj file.
+   Create an empty .psproj file, and optionally creates some base template files for a module Project.
 .DESCRIPTION
    In order to start populating a .psproj file with the Add and Remove commands one needs to have an existing .psproj because we are validating the existance of the file in all of the other commands in this module that take the -ProjectFile parameter.
 .EXAMPLE
-   New-PspPowershellProject ISEPSProject
-   Get-ChildItem ISEPSProject.psproj
+    PS> New-PspPowershellProject -ProjectFile ISEPSProject -CreateNewProjectDetails
+
+1 file(s) have been added to the project
+0 duplicate file(s) have been skipped
+0 source file(s) have had their TAB locations updated
+0 source file(s) have been skipped
+1 file(s) have been added to the project
+0 duplicate file(s) have been skipped
+0 source file(s) have had their TAB locations updated
+0 source file(s) have been skipped
+
+   PS> Get-ChildItem ISEPSProject.psproj
 
 
     Directory: C:\Powershell\ISEPSProject
@@ -15,7 +25,22 @@
 
 Mode                LastWriteTime         Length Name                                                                                                                                                                
 ----                -------------         ------ ----                                                                                                                                                                
--a----       12/28/2016   7:57 AM            912 ISEPSProject.psproj                                                                                                                                                 
+-a----       12/28/2016   7:57 AM            912 ISEPSProject.psproj
+
+    PS> Get-ChildItem .psproj
+
+
+    Directory: C:\Users\Christopher.Maahs\Documents\Projects\Documentation\ISEPSProjectDocs\.psproj
+
+
+Mode                LastWriteTime         Length Name                                                                                            
+----                -------------         ------ ----                                                                                            
+d-----        8/27/2018   8:14 PM                files                                                                                           
+-a----        8/27/2018   8:14 PM           1456 defaults.clixml                                                                                 
+
+
+    
+                                                                                                                                                     
 
 .EXAMPLE
 When the file exists with the .psproj extension, and we only specify the basename, we will fail with a warning.
@@ -95,6 +120,19 @@ At line:1 char:26
     {
         $projectData = @{"$($ProjectFileToCreate)"="$($ProjectFileToCreate)";"ISEPSProjectDataVersion"="$((Get-PspPowershellProjectCurrentVersion).CurrentVersion)"}
         $projectData | Export-Clixml -Path $ProjectFileToCreate -Force
+        if ( $projectData.ContainsKey("ISEPSProjectDataVersion") )
+        {
+            $projectData.Remove("ISEPSProjectDataVersion")
+        }
+
+        if ( -not ( Test-Path ".\.psproj" ) )
+        {
+            $newDir = New-Item -Path ".\.psproj" -ItemType Directory
+        }
+        if ( -not ( Test-Path ".\.psproj\files" ) )
+        {
+            $newDir = New-Item -Path ".\.psproj\files" -ItemType Directory
+        }
 
         if ( $CreateNewProjectDetails -eq $true )
         {
@@ -105,7 +143,7 @@ At line:1 char:26
             $psdFileName = ".\Deploy\$($baseName).psd1"
             if ( -not ( Test-Path ".\Deploy" ) )
             {
-                New-Item -Path ".\Deploy" -ItemType Directory
+                $newdir = New-Item -Path ".\Deploy" -ItemType Directory
             }
             if ( -not ( Test-Path $psdFileName ) )
             {
@@ -124,7 +162,8 @@ At line:1 char:26
 RootModule = '.\$($baseName).psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+# Publish-Module doesn't care for two digit versions, so keep it to three digit.
+ModuleVersion = '1.0.0'
 
 # ID used to uniquely identify this module
 GUID = '$(New-Guid)'
@@ -237,7 +276,6 @@ TODO: Add Release Notes
                 #Add PSD to Defaults
                 Set-PspPowershellProjectDefaults -ModulePSDFile $psdFileName
                 Add-PspSourceToPowershellProject -ProjectFile $ProjectFileToCreate -SourceFile $psdFileName
-                Set-PspPowershellProjectDefaults -IncludeInBuild Yes
             } else {
                 Write-Warning "A PSD1 file already exists in the Deploy directory."
             }
@@ -247,7 +285,7 @@ TODO: Add Release Notes
             $readmeFileName = ".\Deploy\README.md"
             if ( -not ( Test-Path ".\Deploy" ) )
             {
-                New-Item -Path ".\Deploy" -ItemType Directory
+                $newDir = New-Item -Path ".\Deploy" -ItemType Directory
             }
             if ( -not ( Test-Path $readmeFileName ) )
             {
@@ -259,15 +297,45 @@ TODO: Add a description
 
 ### Functionality
 "@
-                $readeTemplate | Out-File -FilePath $readmeFileName -Force -Encoding ascii
+                $readmeTemplate | Out-File -FilePath $readmeFileName -Force -Encoding ascii
 
                 #Add README to Defaults
+                Write-Verbose "Adding README.md file to defaults..."
                 Set-PspPowershellProjectDefaults -ModuleREADMEFile $readmeFileName
+                Write-Verbose "Adding README.md to Project."
                 Add-PspSourceToPowershellProject -ProjectFile $ProjectFileToCreate -SourceFile $readmeFileName
-                Set-PspPowershellProjectDefaults -IncludeInBuild Yes
             } else {
                 Write-Warning "A README.md file already exists in the Deploy directory."
             }
+
+            #Module_Init.ps1 File Creation
+            $moduleInitFileName = ".\Deploy\Module_Init.ps1"
+            if ( -not ( Test-Path ".\Deploy" ) )
+            {
+                $newDir = New-Item -Path ".\Deploy" -ItemType Directory
+            }
+            if ( -not ( Test-Path $moduleInitFileName ) )
+            {
+                $moduleInitTemplate = @"
+# This code will run at "Import-Module" time.
+# Careful, as sometimes with the way Powershell can auto-import Module Functions, it is possible to execute a module contained function without triggering this.
+
+Get-Command -Module $($baseName) 
+
+"@
+                $moduleInitTemplate | Out-File -FilePath $moduleInitFileName -Force -Encoding ascii
+
+                #Add Module Init to Defaults
+                Write-Verbose "Adding Module_Init file to defaults..."
+                Set-PspPowershellProjectDefaults -ModuleInitFile $moduleInitFileName
+                Write-Verbose "Adding Module_Init to Project."
+                Add-PspSourceToPowershellProject -ProjectFile $ProjectFileToCreate -SourceFile $moduleInitFileName
+            } else {
+                Write-Warning "A Module_Init.ps1 file already exists in the Deploy directory."
+            }
+            
+            Write-Verbose "Setting include in build to Yes"                            
+            Set-PspPowershellProjectDefaults -IncludeInBuild Yes
         } #CreateNewProjectDetails is true
     }
 }

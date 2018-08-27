@@ -1,0 +1,6 @@
+{
+    "FileName":  "PSProj_Management\\Get-PspPowershellProjectFilesNotIncludedInProject.ps1",
+    "ProjectTab":  "PSProj_Management",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  999
+}

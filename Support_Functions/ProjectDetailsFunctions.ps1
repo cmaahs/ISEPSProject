@@ -1,4 +1,8 @@
-﻿Function Get-PspPowershellProjectFunctions
+﻿<#
+These functions have been moved to the PSProj_Management Tab.
+#>
+
+Function Get-PspPowershellProjectFunctions
 {
 <#
 .Synopsis
@@ -213,6 +217,7 @@ function Get-PspPowershellProjectKeys
     {
     }
 }
+
 Function Get-PspPowershellProjectFilesNotIncludedInProject
 {
 <#

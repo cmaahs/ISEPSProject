@@ -127,36 +127,63 @@ At line:1 char:83
     {
         if ( $continueProcessing -eq $true )
         {
-            $projectData = Import-Clixml -Path $ProjectFile
+            if ( (Get-PspPowershellProjectVersion -ProjectFile $ProjectFile).IsLatest -eq $true )
+            {                
+                # version 1.3 and later.
+                $projectData = Get-PspProjectData # Import-Clixml -Path $ProjectFile
 
-            if ( $ProjectFile.StartsWith(".\") )
-            {
-                $projectFileKey = $ProjectFile.SubString(2)
-            } else {
-                $projectFileKey = $ProjectFile
-            }
-            
-            $removedItems = 0
-            $removeKey = @()
-            foreach ( $key in $projectData.Keys )
-            {
-                Write-Verbose "Checking $key"
-                if ( ( $key -ne $projectFileKey ) -and ( $key -ne "ISEPSProjectDataVersion" ) )
+                $removedItems = 0
+                $removeKey = @()
+                $controlDirectory = Get-PspControlDirectory
+                foreach ( $key in $projectData.Keys )
                 {
+                    Write-Verbose "Checking $key"
                     if ( -Not ( Test-Path $key ) ) 
                     {
                         $removeKey += $key
+                        $removedItem = Remove-Item -Path "$($controlDirectory)\.psproj\files\$($removeKey).json" 
                         $removedItems++
                     }
                 }
-            }
 
-            foreach ( $item_removeKey in $removeKey ) 
-            {
-                $projectData.Remove($item_removeKey)
-            }
+                foreach ( $item_removeKey in $removeKey ) 
+                {
+                    $projectData.Remove($item_removeKey)
+                }
+                
+            } else {
+                # version pre 1.3
+                $projectData = Import-Clixml -Path $ProjectFile
 
-            Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+                if ( $ProjectFile.StartsWith(".\") )
+                {
+                    $projectFileKey = $ProjectFile.SubString(2)
+                } else {
+                    $projectFileKey = $ProjectFile
+                }
+            
+                $removedItems = 0
+                $removeKey = @()
+                foreach ( $key in $projectData.Keys )
+                {
+                    Write-Verbose "Checking $key"
+                    if ( ( $key -ne $projectFileKey ) -and ( $key -ne "ISEPSProjectDataVersion" ) )
+                    {
+                        if ( -Not ( Test-Path $key ) ) 
+                        {
+                            $removeKey += $key
+                            $removedItems++
+                        }
+                    }
+                }
+
+                foreach ( $item_removeKey in $removeKey ) 
+                {
+                    $projectData.Remove($item_removeKey)
+                }
+
+                Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+            }
 
             Write-Output "$($removedItems) source file(s) have been removed from the project."
         } #continue processing

@@ -1,0 +1,6 @@
+{
+    "FileName":  "PSProj_Defaults\\Get-PspPowershellProjectDefaultBuildStyle.ps1",
+    "ProjectTab":  "PSProj_Defaults",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  305
+}

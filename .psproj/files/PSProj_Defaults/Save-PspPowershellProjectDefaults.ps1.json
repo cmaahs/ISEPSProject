@@ -1,0 +1,6 @@
+{
+    "FileName":  "PSProj_Defaults\\Save-PspPowershellProjectDefaults.ps1",
+    "ProjectTab":  "PSProj_Defaults",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  365
+}

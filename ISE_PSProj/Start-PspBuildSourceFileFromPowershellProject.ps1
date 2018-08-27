@@ -15,8 +15,14 @@ Import the built PS1 file into your session with:
     [CmdletBinding()]
     Param
     (   
-        <#PINC:ProjectFile#>
-        <#PINC:PARAMCOMMA#>
+        # Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
+        [Parameter(Mandatory=$false,
+                   Position=1)]
+        [Alias('File','FilePath')]
+        #[ValidateScript({ Test-Path $_ })]
+        [string]       
+        $ProjectFile = (Get-PspPowershellProjectDefaultProjectFile)
+        ,
         # Specify the source file name to build in ./bin/
         [Parameter(Mandatory=$true,
                    Position=1)]

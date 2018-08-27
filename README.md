@@ -74,7 +74,7 @@ NAME
     New-PspPowershellProject
     
 SYNOPSIS
-    Create an empty .psproj file.
+    Create an empty .psproj file, and optionally creates some base template files for a module Project.
     
     
 SYNTAX
@@ -82,8 +82,7 @@ SYNTAX
     
     
 DESCRIPTION
-    In order to start populating a .psproj file with the Add and Remove commands one needs to have an existing .psproj because we are validating the existance of the 
-    file in all of the other commands in this module that take the -ProjectFile parameter.
+    In order to start populating a .psproj file with the Add and Remove commands one needs to have an existing .psproj because we are validating the existance of the file in all of the other commands in this module that take the -ProjectFile parameter.
     
 
 PARAMETERS
@@ -117,19 +116,37 @@ OUTPUTS
     
     -------------------------- EXAMPLE 1 --------------------------
     
-    PS C:\>New-PspPowershellProject ISEPSProject
+    PS>New-PspPowershellProject -ProjectFile ISEPSProject -CreateNewProjectDetails
     
-    Get-ChildItem ISEPSProject.psproj
+    1 file(s) have been added to the project
+    0 duplicate file(s) have been skipped
+    0 source file(s) have had their TAB locations updated
+    0 source file(s) have been skipped
+    1 file(s) have been added to the project
+    0 duplicate file(s) have been skipped
+    0 source file(s) have had their TAB locations updated
+    0 source file(s) have been skipped
+    
+    PS> Get-ChildItem ISEPSProject.psproj
     
     
-     Directory: C:\Powershell\ISEPSProject
+    Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
     -a----       12/28/2016   7:57 AM            912 ISEPSProject.psproj
+    
+    PS> Get-ChildItem .psproj
+    
+    
+    Directory: C:\Users\Christopher.Maahs\Documents\Projects\Documentation\ISEPSProjectDocs\.psproj
+    
+    
+    Mode                LastWriteTime         Length Name                                                                                            
+    ----                -------------         ------ ----                                                                                            
+    d-----        8/27/2018   8:14 PM                files                                                                                           
+    -a----        8/27/2018   8:14 PM           1456 defaults.clixml
     
     
     
@@ -144,28 +161,17 @@ OUTPUTS
         Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016   7:28 AM           1993 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   7:44 AM           1207 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016   7:44 AM            912 ISEPSProject.psproj                                                                                                
-                                                       
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016   7:28 AM           1993 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   7:44 AM           1207 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016   7:44 AM            912 ISEPSProject.psproj                                                                                                                                                   
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
         New-PspPowershellProject ISEProject
     
@@ -180,8 +186,7 @@ OUTPUTS
     
     New-PspPowershellProject ISEPSProject.psproj
     
-    New-PspPowershellProject : Cannot validate argument on parameter 'ProjectFile'. The " -Not (Test-Path $_) " validation script for the argument with value 
-    "ISEPSProject.psproj" did not return a result of True. 
+    New-PspPowershellProject : Cannot validate argument on parameter 'ProjectFile'. The " -Not (Test-Path $_) " validation script for the argument with value "ISEPSProject.psproj" did not return a result of True. 
     Determine why the validation script failed, and then try the command again.
     At line:1 char:26
     + New-PspPowershellProject ISEPSProject.psproj
@@ -267,8 +272,7 @@ NAME
     Close-PspPowershellProject
     
 SYNOPSIS
-    Close Project Source files if they are saved.  This routine was born out of the problem of simply closing ISE with bunches of files/tabs open.  Often the next 
-    re-open caused ISE to go into recovery mode.
+    Close Project Source files if they are saved.  This routine was born out of the problem of simply closing ISE with bunches of files/tabs open.  Often the next re-open caused ISE to go into recovery mode.
     
     
 SYNTAX
@@ -329,13 +333,11 @@ SYNOPSIS
     
     
 SYNTAX
-    Add-PspSourceToPowershellProject [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-ProjectTab] <String>] 
-    [[-ReadMeOrder] <Int32>] [[-IncludeInBuild]] [<CommonParameters>]
+    Add-PspSourceToPowershellProject [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-ReadMeOrder] <Int32>] [[-IncludeInBuild]] [[-ExcludeFromBuild]] [<CommonParameters>]
     
     
 DESCRIPTION
-    Add a source file and corresponding TAB name to the .psproj file so it can be opened as a single project later.  A backup in the -streams section of the file will 
-    also be created.
+    Add a source file and corresponding TAB name to the .psproj file so it can be opened as a single project later.  A backup in the -streams section of the file will also be created.
     10 backups will be kept and can be listed with Get-PspPowershellProjectBackup function.
     
 
@@ -376,16 +378,16 @@ PARAMETERS
         Accept pipeline input?       false
         Accept wildcard characters?  false
         
-    -ProjectTab <String>
+    -ReadMeOrder <Int32>
         Name of TAB to place the source file on when opening in ISE via the Open-PspPowershellProject command.
         
-        Required?                    false
-        Position?                    3
-        Default value                
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    -ReadMeOrder <Int32>
+               [Parameter(Mandatory=$false,
+                          Position=2)]
+               [Alias('Tab','TabName')]
+               [string]
+               $ProjectTab = ""
+               ,
+               
         Used to set the ReadMeOrder for the source file.
         
         Required?                    false
@@ -395,12 +397,20 @@ PARAMETERS
         Accept wildcard characters?  false
         
     -IncludeInBuild [<SwitchParameter>]
-        Flag the source file for inclusion in a module build via Start-PspBuildPowershellProject command.  Default can be set via Set-PspPowershellProjectDefaults 
-        command.
+        Flag the source file for inclusion in a module build via Start-PspBuildPowershellProject command.  Default can be set via Set-PspPowershellProjectDefaults command.
         
         Required?                    false
         Position?                    5
-        Default value                (Get-PspPowershellProjectDefaultIncludeInBuild)
+        Default value                False
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -ExcludeFromBuild [<SwitchParameter>]
+        Flag the source file for exclusion in a module build via Start-PspBuildPowershellProject command.  Default can be set via Set-PspPowershellProjectDefaults command.
+        
+        Required?                    false
+        Position?                    6
+        Default value                False
         Accept pipeline input?       false
         Accept wildcard characters?  false
         
@@ -421,28 +431,17 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016   8:10 AM           2115 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016   8:06 AM            718 ISEPSProject.psproj                                                                                                
-                                                     
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016   8:10 AM           2115 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016   8:06 AM            718 ISEPSProject.psproj                                                                                                                                                 
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
     
     
@@ -461,33 +460,21 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016   8:10 AM           2115 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016   8:06 AM            718 ISEPSProject.psproj                                                                                                
-                                                     
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016   8:10 AM           2115 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016   7:17 AM            691 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016   8:06 AM            718 ISEPSProject.psproj                                                                                                                                                 
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
     
     
-    Add-PspSourceToPowershellProject -ProjectFile .\ISEPSProject.psproj -SourceFile .\Repair-PspPowershellProject.ps1,Compare-PspPowershellProjectBackup.ps1 
-    -ProjectTab "ISE PSProj" -IncludeInBuild
+    Add-PspSourceToPowershellProject -ProjectFile .\ISEPSProject.psproj -SourceFile .\Repair-PspPowershellProject.ps1,Compare-PspPowershellProjectBackup.ps1 -ProjectTab "ISE PSProj" -IncludeInBuild
     
     2 file(s) have been added to the project
     0 duplicate file(s) have been skipped
@@ -502,28 +489,17 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016   8:26 AM           7895 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016   8:29 AM            716 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016   8:28 AM           1482 ISEPSProject.psproj                                                                                                
-                                                     
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016   8:26 AM           7895 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/27/2016   8:04 PM           1865 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016   8:29 AM            716 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016   8:28 AM           1482 ISEPSProject.psproj                                                                                                                                                 
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016   7:29 AM           2135 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
     
     
@@ -735,8 +711,7 @@ SYNTAX
     
     
 DESCRIPTION
-    Occasionally you will have removed/renamed source files and since we are doing ValidateScripts on passed in source file names these cannot be removed using the 
-    Remove-PspSourceFromPowershellProject cmdlet.
+    Occasionally you will have removed/renamed source files and since we are doing ValidateScripts on passed in source file names these cannot be removed using the Remove-PspSourceFromPowershellProject cmdlet.
     
     This command will loop through the .psproj file's source files and determine if they exist, and if not, they will be removed.
     
@@ -769,28 +744,17 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016  10:12 AM          11291 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/28/2016  10:26 AM           2470 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016  10:22 AM           1688 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016  10:14 AM           2648 ISEPSProject.psproj                                                                                                
-                                                     
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016  10:12 AM           5237 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016  10:12 AM          11291 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/28/2016  10:26 AM           2470 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016  10:22 AM           1688 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016  10:14 AM           2648 ISEPSProject.psproj                                                                                                                                                 
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016  10:12 AM           5237 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
     
     
@@ -800,12 +764,9 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016  10:27 AM              0 DoNothing-OnNothing.ps1                                                                                            
-                                                     
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016  10:27 AM              0 DoNothing-OnNothing.ps1                                                                                                                                             
     
     
     
@@ -836,35 +797,23 @@ OUTPUTS
     Directory: C:\Powershell\ISEPSProject
     
     
-    Mode                LastWriteTime         Length Name                                                                                                               
-                                                     
-    ----                -------------         ------ ----                                                                                                               
-                                                     
-    -a----       12/28/2016  10:12 AM          11291 Add-PspSourceToPowershellProject.ps1                                                                               
-                                                        
-    -a----       12/28/2016  10:26 AM           2470 Repair-PspPowershellProject.ps1                                                                                    
-                                                         
-    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                             
-                                                        
-    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                       
-                                                     
-    -a----       12/28/2016  10:22 AM           1688 Get-PspPowershellProject.ps1                                                                                       
-                                                        
-    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                 
-                                                        
-    -a----       12/28/2016  10:28 AM           2868 ISEPSProject.psproj                                                                                                
-                                                     
-    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                      
-                                                        
-    -a----       12/28/2016  10:12 AM           5237 Remove-PspSourceFromPowershellProject.ps1                                                                          
-                                                        
+    Mode                LastWriteTime         Length Name                                                                                                                                                                
+    ----                -------------         ------ ----                                                                                                                                                                
+    -a----       12/28/2016  10:12 AM          11291 Add-PspSourceToPowershellProject.ps1                                                                                                                                   
+    -a----       12/28/2016  10:26 AM           2470 Repair-PspPowershellProject.ps1                                                                                                                                         
+    -a----       12/27/2016   7:46 PM           1715 Compare-PspPowershellProjectBackup.ps1                                                                                                                                 
+    -a----       12/28/2016   8:06 AM           5637 New-PspPowershellProject.ps1                                                                                                                                        
+    -a----       12/28/2016  10:22 AM           1688 Get-PspPowershellProject.ps1                                                                                                                                           
+    -a----       12/27/2016   7:45 PM            916 Get-PspPowershellProjectBackup.ps1                                                                                                                                     
+    -a----       12/28/2016  10:28 AM           2868 ISEPSProject.psproj                                                                                                                                                 
+    -a----       12/28/2016   7:23 AM           2035 Open-PspPowershellProject.ps1                                                                                                                                          
+    -a----       12/28/2016  10:12 AM           5237 Remove-PspSourceFromPowershellProject.ps1                                                                                                                              
     
     
     
     Remove-PspSourceFromPowershellProject -ProjectFile .\ISEPSProject.psproj -SourceFile DoNothing-OnNothing.ps1
     
-    Remove-PspSourceFromPowershellProject : Cannot validate argument on parameter 'SourceFile'. The " Test-Path $_ " validation script for the argument with value 
-    "DoNothing-OnNothing.ps1" did not return a result of 
+    Remove-PspSourceFromPowershellProject : Cannot validate argument on parameter 'SourceFile'. The " Test-Path $_ " validation script for the argument with value "DoNothing-OnNothing.ps1" did not return a result of 
     True. Determine why the validation script failed, and then try the command again.
     At line:1 char:83
     + ... ProjectFile .\ISEPSProject.psproj -SourceFile DoNothing-OnNothing.ps1
@@ -978,9 +927,8 @@ SYNOPSIS
     
     
 SYNTAX
-    Set-PspPowershellProjectDefaults [[-ProjectFile] <String>] [[-IncludeInBuild] <String>] [[-BuildStyle] <String>] [[-LocalDeployDirectory] <String>] 
-    [[-ModuleInitFile] <String>] [[-ModulePSDFile] <String>] [[-ModuleREADMEFile] <String>] [[-ModuleAdditionalZipFile] <Object>] [[-PreBuildCommand] <Object>] 
-    [<CommonParameters>]
+    Set-PspPowershellProjectDefaults [[-ProjectFile] <String>] [[-IncludeInBuild] <String>] [[-BuildStyle] <String>] [[-LocalDeployDirectory] <String>] [[-ModuleInitFile] <String>] [[-ModulePSDFile] <String>] [[-ModuleREADMEFile] <String>] [[-ModuleAdditionalZipFile] <Object>] [[-PreBuildCommand] 
+    <Object>] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -1133,8 +1081,7 @@ OUTPUTS
     
     -------------------------- EXAMPLE 5 --------------------------
     
-    PS C:\>Set the PSD file for the project.  Do NOT reference this file in the ROOT of the project.  This "source" version will be used as a template to build the 
-    module psd1 file in the ROOT of the project.
+    PS C:\>Set the PSD file for the project.  Do NOT reference this file in the ROOT of the project.  This "source" version will be used as a template to build the module psd1 file in the ROOT of the project.
     
     The reason for this is so we can simply check out from Git into a Modules directory and have the module function correctly.
     
@@ -1172,13 +1119,11 @@ SYNOPSIS
     
     
 SYNTAX
-    Set-PspIncludeInBuildFlagForSource [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-Exclude]] [[-Include]] 
-    [<CommonParameters>]
+    Set-PspIncludeInBuildFlagForSource [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-Exclude]] [[-Include]] [<CommonParameters>]
     
     
 DESCRIPTION
-    Each source item in the .psproj file contains a flag named IncludeInBuild.  This flag drives the inclusion of the source file in the 
-    Start-PspBuildPowershellProject command.
+    Each source item in the .psproj file contains a flag named IncludeInBuild.  This flag drives the inclusion of the source file in the Start-PspBuildPowershellProject command.
     
 
 PARAMETERS
@@ -1366,8 +1311,7 @@ SYNOPSIS
     
     
 SYNTAX
-    Set-PspReadMeOrderForSource [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-ReadMeOrder] <Int32>] 
-    [<CommonParameters>]
+    Set-PspReadMeOrderForSource [-Name <String[]>] [-Directory <String[]>] [[-ProjectFile] <String>] [[-SourceFile] <String[]>] [[-ReadMeOrder] <Int32>] [<CommonParameters>]
     
     
 DESCRIPTION
@@ -1455,8 +1399,7 @@ NAME
     Start-PspBuildPowershellProject
     
 SYNOPSIS
-    Create a single PSM1 file from the PS1 files included in the .psproj file.  Because the ISE editor doesn't yet have great code navigation tools, it is easier to 
-    have smaller source files opened separately.
+    Create a single PSM1 file from the PS1 files included in the .psproj file.  Because the ISE editor doesn't yet have great code navigation tools, it is easier to have smaller source files opened separately.
     
     
 SYNTAX
@@ -1464,8 +1407,7 @@ SYNTAX
     
     
 DESCRIPTION
-    This process will loop through the Source files and check for the IncludeInBuild flag.  Any source file with the include flag will be copied into the 
-    {projectname}.psm1 file.
+    This process will loop through the Source files and check for the IncludeInBuild flag.  Any source file with the include flag will be copied into the {projectname}.psm1 file.
     
 
 PARAMETERS
@@ -1512,12 +1454,9 @@ OUTPUTS
     PS C:\>Start-PspBuildPowershellProject -ProjectFile ISEPSProject.psproj -Force
     
     Build Created.
-    All functions export: FunctionsToExport = 
-    @('Add-PspSourceToPowershellProject','Start-PspBuildPowershellProject','Repair-PspPowershellProject','Close-PspPowershellProject','Create-PowershellProjec
-    t','Get-PspPowershellProject','Open-PspPowershellProject','Remove-PspSourceFromPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefa
-    ults','Get-PspCSVFromStringArray
-    ','Get-PspPowershellProjectBackupData','Get-PspPowershellProjectCurrentVersion','Get-PspPowershellProjectDefaultIncludeInBuild','Get-PspPowershellProjectDefaultProj
-    ectFile','Get-PowershellPr
+    All functions export: FunctionsToExport = @('Add-PspSourceToPowershellProject','Start-PspBuildPowershellProject','Repair-PspPowershellProject','Close-PspPowershellProject','Create-PowershellProjec
+    t','Get-PspPowershellProject','Open-PspPowershellProject','Remove-PspSourceFromPowershellProject','Set-PspIncludeInBuildFlagForSource','Set-PspPowershellProjectDefaults','Get-PspCSVFromStringArray
+    ','Get-PspPowershellProjectBackupData','Get-PspPowershellProjectCurrentVersion','Get-PspPowershellProjectDefaultIncludeInBuild','Get-PspPowershellProjectDefaultProjectFile','Get-PowershellPr
     ojectFunctions','Get-PspPowershellProjectVersion','Save-PspPowershellProject','Save-PspPowershellProjectDefaults','Update-PspPowershellProjectVersion')
     
     
@@ -1547,8 +1486,7 @@ SYNTAX
     
     
 DESCRIPTION
-    when we use the <#PINC: replacement feature, we cannot simply RUN the code in the ISE editor window in order to add the function to our session.  We need to 
-    "build" it first, then we can dot load it into our session from the "bin" directory.
+    when we use the <#PINC: replacement feature, we cannot simply RUN the code in the ISE editor window in order to add the function to our session.  We need to "build" it first, then we can dot load it into our session from the "bin" directory.
     
 
 PARAMETERS
@@ -1557,7 +1495,7 @@ PARAMETERS
         [ValidateScript({ Test-Path $_ })]
         
         Required?                    false
-        Position?                    1
+        Position?                    2
         Default value                (Get-PspPowershellProjectDefaultProjectFile)
         Accept pipeline input?       false
         Accept wildcard characters?  false
@@ -1676,395 +1614,6 @@ OUTPUTS
     VERBOSE: Module File Name: ISEPSProject.psm1
     VERBOSE: Manifest File Name: ISEPSProject.psd1
     VERBOSE: Target Path: C:\Program Files\WindowsPowerShell\Modules\ISEPSProject
-    
-    
-    
-    
-    
-RELATED LINKS
-
-
-
-
-
-```
-#### Get-PspRelativePathFromProjectRoot
-
-```powershell
-
-NAME
-    Get-PspRelativePathFromProjectRoot
-    
-SYNOPSIS
-    Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
-    
-    
-SYNTAX
-    Get-PspRelativePathFromProjectRoot [[-FullName] <Object>] [[-ProjectFile] <String>] [<CommonParameters>]
-    
-    
-DESCRIPTION
-    Used to feed other Powershell Project commands.
-    
-
-PARAMETERS
-    -FullName <Object>
-        File Item from .psproj file.
-        
-        Required?                    false
-        Position?                    1
-        Default value                
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    -ProjectFile <String>
-        Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
-        [ValidateScript({ Test-Path $_ })]
-        
-        Required?                    false
-        Position?                    2
-        Default value                (Get-PspPowershellProjectDefaultProjectFile)
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
-        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
-    
-INPUTS
-    
-OUTPUTS
-    
-    -------------------------- EXAMPLE 1 --------------------------
-    
-    PS C:\>
-    
-    
-    
-    
-    
-    
-    
-RELATED LINKS
-
-
-
-
-
-```
-#### Start-IsePsPublishToEvcNuGet
-
-```powershell
-
-NAME
-    Start-IsePsPublishToEvcNuGet
-    
-SYNTAX
-    Start-IsePsPublishToEvcNuGet  
-    
-    
-PARAMETERS
-    None
-    
-    
-INPUTS
-    None
-    
-    
-OUTPUTS
-    System.Object
-    
-ALIASES
-    None
-    
-
-REMARKS
-    None
-
-
-
-
-
-```
-#### Get-PspPowershellProjectDefaults
-
-```powershell
-
-NAME
-    Get-PspPowershellProjectDefaults
-    
-SYNOPSIS
-    Save a .psproj\defaults.clixml file.  This will allow you to skip the -ProjectFile parameter and sets the default IncludeInBuild option for adding items to the 
-    project.
-    
-    
-SYNTAX
-    Get-PspPowershellProjectDefaults [<CommonParameters>]
-    
-    
-DESCRIPTION
-    This is simply a file that will be read by each of the commands in order to pre-populate the -ProjectFile and -IncludeInBuild parameters.
-    
-
-PARAMETERS
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
-        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
-    
-INPUTS
-    
-OUTPUTS
-    
-    -------------------------- EXAMPLE 1 --------------------------
-    
-    PS C:\>$default = "" | Select-Object ProjectFile,IncludeInBuild,BuildStyle
-    
-    $defualt.ProjectFile = ".\ISEPSProject.psproj"
-    $default.IncludeInBuild = $true
-    $default.BuildStyle = "IncludeStyle"
-    Save-PspPowershellProjectDefaults -DefaultData $default
-    
-    
-    
-    
-    
-RELATED LINKS
-
-
-
-
-
-```
-#### New-PspIsePsZipInstallDetails
-
-```powershell
-
-NAME
-    New-PspIsePsZipInstallDetails
-    
-SYNOPSIS
-    Extract Zip File information.
-    
-    
-SYNTAX
-    New-PspIsePsZipInstallDetails [-ZipFile] <String> [-RelativeInstallPath] <String> [<CommonParameters>]
-    
-    
-DESCRIPTION
-    
-
-PARAMETERS
-    -ZipFile <String>
-        Zip File to expand during deploy
-        
-        Required?                    true
-        Position?                    1
-        Default value                
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    -RelativeInstallPath <String>
-        Relative Path to Extract ZIP to
-        
-        Required?                    true
-        Position?                    2
-        Default value                
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
-        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
-    
-INPUTS
-    
-OUTPUTS
-    
-    -------------------------- EXAMPLE 1 --------------------------
-    
-    PS C:\>
-    
-    
-    
-    
-    
-    
-    
-RELATED LINKS
-
-
-
-
-
-```
-#### Get-PspPowershellProjectFilesNotIncludedInProject
-
-```powershell
-
-NAME
-    Get-PspPowershellProjectFilesNotIncludedInProject
-    
-SYNOPSIS
-    Display the files in the PROJECT directory that haven't been added as a source.
-    
-    
-SYNTAX
-    Get-PspPowershellProjectFilesNotIncludedInProject [<CommonParameters>]
-    
-    
-DESCRIPTION
-    
-
-PARAMETERS
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
-        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
-    
-INPUTS
-    
-OUTPUTS
-    
-    -------------------------- EXAMPLE 1 --------------------------
-    
-    PS C:\>
-    
-    
-    
-    
-    
-    
-    
-RELATED LINKS
-
-
-
-
-
-```
-#### Get-PspPowershellProjectFunctions
-
-```powershell
-
-NAME
-    Get-PspPowershellProjectFunctions
-    
-SYNOPSIS
-    Gets a list of the commands (function) inside of the source files contained in the .psproj file.
-    
-    
-SYNTAX
-    Get-PspPowershellProjectFunctions [[-ProjectFile] <String>] [[-IncludedInBuildOnly]] [[-IncludeOnlyPublic]] [<CommonParameters>]
-    
-    
-DESCRIPTION
-    Generate a list of commands (function) with their containing source file information.
-    
-
-PARAMETERS
-    -ProjectFile <String>
-        Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
-        [ValidateScript({ Test-Path $_ })]
-        
-        Required?                    false
-        Position?                    1
-        Default value                (Get-PspPowershellProjectDefaultProjectFile)
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    -IncludedInBuildOnly [<SwitchParameter>]
-        Switch to only include those source files that have the IncludeInBuild flag set.
-        
-        Required?                    false
-        Position?                    2
-        Default value                False
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    -IncludeOnlyPublic [<SwitchParameter>]
-        Switch to only include PUBLIC exported functions
-        
-        Required?                    false
-        Position?                    3
-        Default value                False
-        Accept pipeline input?       false
-        Accept wildcard characters?  false
-        
-    <CommonParameters>
-        This cmdlet supports the common parameters: Verbose, Debug,
-        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
-        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
-        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
-    
-INPUTS
-    
-OUTPUTS
-    
-    -------------------------- EXAMPLE 1 --------------------------
-    
-    PS>Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj | Sort-Object -Property SourceFile,FunctionName
-    
-    Name                                       SourceFile                            
-    ------------                               ----------                            
-    Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
-    Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
-    Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
-    Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
-    Compare-PspPowershellProjectBackup            Compare-PspPowershellProjectBackup.ps1   
-    New-PspPowershellProject                   New-PspPowershellProject.ps1          
-    Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
-    Get-PspPowershellProjectBackup                Get-PspPowershellProjectBackup.ps1       
-    Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
-    Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
-    Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
-    Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
-    Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
-    Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
-    Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
-    Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
-    Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
-    Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
-    Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
-    Save-PspPowershellProject                     UtilityFunctions.ps1                  
-    Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
-    Update-PspPowershellProjectVersion            UtilityFunctions.ps1
-    
-    
-    
-    
-    -------------------------- EXAMPLE 2 --------------------------
-    
-    PS>Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName
-    
-    Name                                       SourceFile                            
-    ------------                               ----------                            
-    Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
-    Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
-    Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
-    Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
-    New-PspPowershellProject                   New-PspPowershellProject.ps1          
-    Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
-    Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
-    Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
-    Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
-    Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
-    Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
-    Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
-    Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
-    Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
-    Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
-    Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
-    Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
-    Save-PspPowershellProject                     UtilityFunctions.ps1                  
-    Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
-    Update-PspPowershellProjectVersion            UtilityFunctions.ps1
     
     
     
@@ -2254,8 +1803,7 @@ SYNTAX
     
     
 DESCRIPTION
-    Versions of the .psproj file are saved in the STREAMS of NTFS and each modification to the .psproj file will create a new backup and bump the old backups down one 
-    slot.
+    Versions of the .psproj file are saved in the STREAMS of NTFS and each modification to the .psproj file will create a new backup and bump the old backups down one slot.
     
 
 PARAMETERS
@@ -2368,6 +1916,557 @@ OUTPUTS
     PS C:\>Compare-PspPowershellProjectBackup -LeftFile 1 -RightFile 0
     
     The output is currently just a Compare-Object of the clixml format.
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Get-PspPowershellProjectDefaults
+
+```powershell
+
+NAME
+    Get-PspPowershellProjectDefaults
+    
+SYNOPSIS
+    We are saving some build/project defaults in .psproj\defaults.clixml.  This function will display those settings.
+    
+    
+SYNTAX
+    Get-PspPowershellProjectDefaults [<CommonParameters>]
+    
+    
+DESCRIPTION
+    
+
+PARAMETERS
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS>Get-PspPowershellProjectDefaults
+    
+    ProjectFile             : ISEPSProject.psproj
+    IncludeInBuild          : True
+    BuildStyle              : IncludeStyle
+    LocalDeployDirectory    : 
+    ModuleInitFile          : 
+    ModuleREADMEFile        : .\Deploy\README.md
+    ModuleAdditionalZipFile : 
+    PreBuildCommand         : 
+    ModulePSDFile           : .\Deploy\ISEPSProject.psd1
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### New-PspIsePsZipInstallDetails
+
+```powershell
+
+NAME
+    New-PspIsePsZipInstallDetails
+    
+SYNOPSIS
+    Extract Zip File information.
+    
+    
+SYNTAX
+    New-PspIsePsZipInstallDetails [-ZipFile] <String> [-RelativeInstallPath] <String> [<CommonParameters>]
+    
+    
+DESCRIPTION
+    
+
+PARAMETERS
+    -ZipFile <String>
+        Zip File to expand during deploy
+        
+        Required?                    true
+        Position?                    1
+        Default value                
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -RelativeInstallPath <String>
+        Relative Path to Extract ZIP to
+        
+        Required?                    true
+        Position?                    2
+        Default value                
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>
+    
+    
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Start-IsePsPublishToEvcNuGet
+
+```powershell
+
+NAME
+    Start-IsePsPublishToEvcNuGet
+    
+SYNTAX
+    Start-IsePsPublishToEvcNuGet  
+    
+    
+PARAMETERS
+    None
+    
+    
+INPUTS
+    None
+    
+    
+OUTPUTS
+    System.Object
+    
+ALIASES
+    None
+    
+
+REMARKS
+    None
+
+
+
+
+
+```
+#### Get-PspRelativePathFromProjectRoot
+
+```powershell
+
+NAME
+    Get-PspRelativePathFromProjectRoot
+    
+SYNOPSIS
+    Returns the PATH part of the SourceFile removing the ROOT path of the .psproj file.
+    
+    
+SYNTAX
+    Get-PspRelativePathFromProjectRoot [[-FullName] <Object>] [[-ProjectFile] <String>] [<CommonParameters>]
+    
+    
+DESCRIPTION
+    Used to feed other Powershell Project commands.
+    
+
+PARAMETERS
+    -FullName <Object>
+        File Item from .psproj file.
+        
+        Required?                    false
+        Position?                    1
+        Default value                
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -ProjectFile <String>
+        Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
+        [ValidateScript({ Test-Path $_ })]
+        
+        Required?                    false
+        Position?                    2
+        Default value                (Get-PspPowershellProjectDefaultProjectFile)
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>
+    
+    
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Get-PspPowershellProjectFunctions
+
+```powershell
+
+NAME
+    Get-PspPowershellProjectFunctions
+    
+SYNOPSIS
+    Gets a list of the commands (function) inside of the source files contained in the .psproj file.
+    
+    
+SYNTAX
+    Get-PspPowershellProjectFunctions [[-ProjectFile] <String>] [[-IncludedInBuildOnly]] [[-IncludeOnlyPublic]] [<CommonParameters>]
+    
+    
+DESCRIPTION
+    Generate a list of commands (function) with their containing source file information.
+    
+
+PARAMETERS
+    -ProjectFile <String>
+        Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
+        [ValidateScript({ Test-Path $_ })]
+        
+        Required?                    false
+        Position?                    1
+        Default value                (Get-PspPowershellProjectDefaultProjectFile)
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -IncludedInBuildOnly [<SwitchParameter>]
+        Switch to only include those source files that have the IncludeInBuild flag set.
+        
+        Required?                    false
+        Position?                    2
+        Default value                False
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    -IncludeOnlyPublic [<SwitchParameter>]
+        Switch to only include PUBLIC exported functions
+        
+        Required?                    false
+        Position?                    3
+        Default value                False
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS>Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj | Sort-Object -Property SourceFile,FunctionName
+    
+    Name                                       SourceFile                            
+    ------------                               ----------                            
+    Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
+    Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
+    Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
+    Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
+    Compare-PspPowershellProjectBackup            Compare-PspPowershellProjectBackup.ps1   
+    New-PspPowershellProject                   New-PspPowershellProject.ps1          
+    Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
+    Get-PspPowershellProjectBackup                Get-PspPowershellProjectBackup.ps1       
+    Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
+    Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
+    Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
+    Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
+    Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
+    Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
+    Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
+    Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
+    Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
+    Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
+    Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
+    Save-PspPowershellProject                     UtilityFunctions.ps1                  
+    Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
+    Update-PspPowershellProjectVersion            UtilityFunctions.ps1
+    
+    
+    
+    
+    -------------------------- EXAMPLE 2 --------------------------
+    
+    PS>Get-PspPowershellProjectFunctions -ProjectFile .\ISEPSProject.psproj -IncludedInBuildOnly | Sort-Object -Property SourceFile,FunctionName
+    
+    Name                                       SourceFile                            
+    ------------                               ----------                            
+    Add-PspSourceToPowershellProject              Add-PspSourceToPowershellProject.ps1     
+    Start-PspBuildPowershellProject                    Start-PspBuildPowershellProject.ps1           
+    Repair-PspPowershellProject                    Repair-PspPowershellProject.ps1           
+    Close-PspPowershellProject                    Close-PspPowershellProject.ps1           
+    New-PspPowershellProject                   New-PspPowershellProject.ps1          
+    Get-PspPowershellProject                      Get-PspPowershellProject.ps1             
+    Open-PspPowershellProject                     Open-PspPowershellProject.ps1            
+    Remove-PspSourceFromPowershellProject         Remove-PspSourceFromPowershellProject.ps1
+    Set-PspIncludeInBuildFlagForSource            Set-PspIncludeInBuildFlagForSource.ps1   
+    Set-PspPowershellProjectDefaults              Set-PspPowershellProjectDefaults.ps1     
+    Get-PspCSVFromStringArray                     UtilityFunctions.ps1                  
+    Get-PspPowershellProjectBackupData            UtilityFunctions.ps1                  
+    Get-PspPowershellProjectCurrentVersion        UtilityFunctions.ps1                  
+    Get-PspPowershellProjectDefaultIncludeInBuild UtilityFunctions.ps1                  
+    Get-PspPowershellProjectDefaultProjectFile    UtilityFunctions.ps1                  
+    Get-PspPowershellProjectFunctions             UtilityFunctions.ps1                  
+    Get-PspPowershellProjectVersion               UtilityFunctions.ps1                  
+    Save-PspPowershellProject                     UtilityFunctions.ps1                  
+    Save-PspPowershellProjectDefaults             UtilityFunctions.ps1                  
+    Update-PspPowershellProjectVersion            UtilityFunctions.ps1
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Get-PspControlDirectory
+
+```powershell
+
+NAME
+    Get-PspControlDirectory
+    
+SYNOPSIS
+    This function will walk from the current $PWD path until it finds the .psproj directory and return that path.
+    
+    
+SYNTAX
+    Get-PspControlDirectory [<CommonParameters>]
+    
+    
+DESCRIPTION
+    Used to feed other Powershell Project commands.
+    
+
+PARAMETERS
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>
+    
+    
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Get-PspPowershellProjectFilesNotIncludedInProject
+
+```powershell
+
+NAME
+    Get-PspPowershellProjectFilesNotIncludedInProject
+    
+SYNOPSIS
+    Display the files in the PROJECT directory that haven't been added as a source.
+    
+    
+SYNTAX
+    Get-PspPowershellProjectFilesNotIncludedInProject [<CommonParameters>]
+    
+    
+DESCRIPTION
+    
+
+PARAMETERS
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>
+    
+    
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Save-PspProjectData
+
+```powershell
+
+NAME
+    Save-PspProjectData
+    
+SYNOPSIS
+    Build a PSObject based on the .psproj\files directory structure.
+    
+    
+SYNTAX
+    Save-PspProjectData [[-ProjectData] <Hashtable>] [<CommonParameters>]
+    
+    
+DESCRIPTION
+    Returns a PSObject based on the JSON data files in .psproj\files directory.
+    
+
+PARAMETERS
+    -ProjectData <Hashtable>
+        
+        Required?                    false
+        Position?                    2
+        Default value                
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>TODO: Example
+    
+    
+    
+    
+    
+    
+    
+RELATED LINKS
+
+
+
+
+
+```
+#### Get-PspProjectData
+
+```powershell
+
+NAME
+    Get-PspProjectData
+    
+SYNOPSIS
+    Build a PSObject based on the .psproj\files directory structure.
+    
+    
+SYNTAX
+    Get-PspProjectData [[-ProjectFile] <String>] [<CommonParameters>]
+    
+    
+DESCRIPTION
+    Returns a PSObject based on the JSON data files in .psproj\files directory.
+    
+
+PARAMETERS
+    -ProjectFile <String>
+        Specify the project file to open.  Default project can be specified via the Set-PspPowershellProjectDefaults command.
+        [ValidateScript({ Test-Path $_ })]
+        
+        Required?                    false
+        Position?                    1
+        Default value                (Get-PspPowershellProjectDefaultProjectFile)
+        Accept pipeline input?       false
+        Accept wildcard characters?  false
+        
+    <CommonParameters>
+        This cmdlet supports the common parameters: Verbose, Debug,
+        ErrorAction, ErrorVariable, WarningAction, WarningVariable,
+        OutBuffer, PipelineVariable, and OutVariable. For more information, see 
+        about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216). 
+    
+INPUTS
+    
+OUTPUTS
+    
+    -------------------------- EXAMPLE 1 --------------------------
+    
+    PS C:\>TODO: Example
+    
+    
     
     
     

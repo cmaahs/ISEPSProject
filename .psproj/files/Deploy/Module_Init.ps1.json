@@ -1,0 +1,6 @@
+{
+    "FileName":  "Deploy\\Module_Init.ps1",
+    "ProjectTab":  "Deploy",
+    "IncludeInBuild":  false,
+    "ReadMeOrder":  999
+}

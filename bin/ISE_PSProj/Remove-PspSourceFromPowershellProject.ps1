@@ -136,32 +136,68 @@ Remove-PspSourceFromPowershellProject -ProjectFile .\ISEPSProject.psproj -Source
             {
                 Update-PspPowershellProjectVersion -ProjectFile $ProjectFile
             }
-            $projectData = Import-Clixml -Path $ProjectFile
 
-            $removedItems = 0
-            $notFoundItems = 0
-            $keyToRemove = @()
-            foreach ($item_SourceFile in $m_SourceFileList)
-            {
-                if ( $item_SourceFile.StartsWith(".\") )
+            if ( (Get-PspPowershellProjectVersion -ProjectFile $ProjectFile).IsLatest -eq $true )
+            {                
+                # version 1.3 and later.
+                $projectData = Get-PspProjectData #Import-Clixml -Path $ProjectFile
+
+                $removedItems = 0
+                $notFoundItems = 0
+                $keyToRemove = @()
+                foreach ($item_SourceFile in $m_SourceFileList)
                 {
-                    $item_SourceFile = $item_SourceFile.SubString(2)
-                }        
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
            
-                if ( $projectData.ContainsKey($item_SourceFile) )
-                {
-                    $keyToRemove += $item_SourceFile
-                } else {
-                    $notFoundItems++
+                    if ( $projectData.ContainsKey($item_SourceFile) )
+                    {
+                        $keyToRemove += $item_SourceFile
+                    } else {
+                        $notFoundItems++
+                    }
                 }
-            }
-            foreach ( $item_keyToRemove in $keyToRemove )
-            {
-                $projectData.Remove($item_keyToRemove)
-                $removedItems++
-            }
+                $controlDirectory = Get-PspControlDirectory
+                foreach ( $item_keyToRemove in $keyToRemove )
+                {
+                    $projectData.Remove($item_keyToRemove)                    
+                    if ( $controlDirectory -ne "" )
+                    {
+                        Write-Verbose "Attempting to remove $($controlDirectory)\.psproj\files\$($item_keyToRemove).json"
+                        $removedItem = Remove-Item -Path "$($controlDirectory)\.psproj\files\$($item_keyToRemove).json" 
+                    }
+                    $removedItems++
+                }
+            } else {
+                # pre version 1.3
+                $projectData = Import-Clixml -Path $ProjectFile
 
-            Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+                $removedItems = 0
+                $notFoundItems = 0
+                $keyToRemove = @()
+                foreach ($item_SourceFile in $m_SourceFileList)
+                {
+                    if ( $item_SourceFile.StartsWith(".\") )
+                    {
+                        $item_SourceFile = $item_SourceFile.SubString(2)
+                    }        
+           
+                    if ( $projectData.ContainsKey($item_SourceFile) )
+                    {
+                        $keyToRemove += $item_SourceFile
+                    } else {
+                        $notFoundItems++
+                    }
+                }
+                foreach ( $item_keyToRemove in $keyToRemove )
+                {
+                    $projectData.Remove($item_keyToRemove)
+                    $removedItems++
+                }
+                Save-PspPowershellProject -ProjectFile $ProjectFile -ProjectData $projectData
+            } # version 1.3 check
         
             Write-Output "$($removedItems) source file(s) have been removed from the project"
             Write-Output "$($notFoundItems) source file(s) were not found in the project"

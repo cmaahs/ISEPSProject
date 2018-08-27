@@ -1,4 +1,8 @@
-﻿Function Get-PspRelativePathFromProjectRoot
+﻿<#
+These functions remain in the Support_Functions Tab, though they have been saved as individual entries.
+#>
+
+Function Get-PspRelativePathFromProjectRoot
 {
 <#
 .Synopsis

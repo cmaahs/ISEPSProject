@@ -1,0 +1,6 @@
+{
+    "FileName":  "ISE_PSProj\\Set-PspIncludeInBuildFlagForSource.ps1",
+    "ProjectTab":  "ISE_PSProj",
+    "IncludeInBuild":  true,
+    "ReadMeOrder":  50
+}

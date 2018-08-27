@@ -1,4 +1,8 @@
-﻿function Get-PspPowershellProjectBackupData
+﻿<#
+These functions have been moved to the PSProj_Management tab
+#>
+
+function Get-PspPowershellProjectBackupData
 {
 <#
 .Synopsis
